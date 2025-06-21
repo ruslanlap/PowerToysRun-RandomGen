@@ -26,11 +26,6 @@ jobs:
     strategy:
       matrix:
         platform: [x64, arm64]
-        include:
-          - platform: x64
-            runtime: win-x64
-          - platform: arm64
-            runtime: win-arm64
     
     steps:
       - name: Checkout code
@@ -56,48 +51,97 @@ jobs:
             echo "IS_TAG=false" >> $GITHUB_OUTPUT
           fi
       
-      - name: Publish
+      - name: Debug Output
         run: |
-          # Clean up old artifacts
-          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue publish
-          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue artifacts
-          New-Item -ItemType Directory -Path "artifacts" -Force
+          Get-ChildItem -Path "RandomGen" -Recurse -Directory | Where-Object { $_.Name -eq "Release" } | ForEach-Object { Write-Host $_.FullName }
+        shell: pwsh
+      
+      - name: Create output directory
+        run: mkdir -p artifacts
+      
+      - name: Copy build output to artifacts directory
+        run: |
+          $artifactDir = "artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
           
-          # Create plugin directory
-          $publishDir = "publish/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
-          $pluginDir = "$publishDir/Community.PowerToys.Run.Plugin.RandomGen"
-          New-Item -ItemType Directory -Path $pluginDir -Force
+          # Create the artifact directory
+          New-Item -ItemType Directory -Force -Path $artifactDir
           
-          # Publish for current platform with all dependencies
-          dotnet publish "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj" `
-            -c Release `
-            -r ${{ matrix.runtime }} `
-            --self-contained true `
-            -p:PublishSingleFile=false `
-            -p:Version=${{ steps.get_version.outputs.VERSION }} `
-            -p:FileVersion=${{ steps.get_version.outputs.VERSION }} `
-            -p:AssemblyVersion=${{ steps.get_version.outputs.VERSION }}.0 `
-            -o "$pluginDir"
+          # Create RandomGen subfolder
+          New-Item -ItemType Directory -Force -Path "$artifactDir/RandomGen"
           
-          # Ensure plugin.json is copied
-          Copy-Item -Path "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/plugin.json" -Destination "$pluginDir" -Force
+          # Define the direct path to the build output
+          $buildOutput = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/bin/${{ matrix.platform }}/Release"
           
-          # Copy Images folder if it exists
-          if (Test-Path "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Images") {
-            Copy-Item -Path "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Images" -Destination "$pluginDir" -Recurse -Force
+          Write-Host "Using build output directory: $buildOutput"
+          
+          # Check if the directory exists
+          if (-not (Test-Path $buildOutput)) {
+            Write-Host "Build output directory not found at expected path. Searching for it..."
+            $buildOutput = Get-ChildItem -Path "RandomGen" -Recurse -Directory | 
+                           Where-Object { $_.Name -eq "Release" -and $_.FullName -like "*${{ matrix.platform }}*" } | 
+                           Select-Object -First 1 -ExpandProperty FullName
+            
+            if ($buildOutput) {
+              Write-Host "Found build output directory: $buildOutput"
+            } else {
+              Write-Error "Could not find any Release directory for platform ${{ matrix.platform }}"
+              exit 1
+            }
           }
           
+          # Check if build output exists before proceeding
+          if (-not (Test-Path $buildOutput)) {
+            Write-Error "Build output directory not found"
+            exit 1
+          }
+          
+          # Check for files directly in the build output directory
+          $files = Get-ChildItem -Path $buildOutput -File
+          if ($files.Count -gt 0) {
+            Write-Host "Found $($files.Count) files in build output directory. Copying directly..."
+            Copy-Item -Path "$buildOutput/*" -Destination "$artifactDir/RandomGen" -Recurse -Force
+            Write-Host "Files copied successfully"
+          } else {
+            # Look for a .NET runtime folder
+            $runtimeFolder = Get-ChildItem -Path $buildOutput -Directory | 
+                             Where-Object { $_.Name -like "net*-windows*" } | 
+                             Select-Object -First 1 -ExpandProperty FullName
+            
+            if ($runtimeFolder) {
+              Write-Host "Found runtime folder: $runtimeFolder"
+              Copy-Item -Path "$runtimeFolder/*" -Destination "$artifactDir/RandomGen" -Recurse -Force
+              Write-Host "Files copied successfully from runtime folder"
+            } else {
+              # If no runtime folder, check for any subdirectories
+              $subDirs = Get-ChildItem -Path $buildOutput -Directory
+              if ($subDirs.Count -gt 0) {
+                $firstSubDir = $subDirs[0].FullName
+                Write-Host "No runtime folder found, but found subdirectory: $firstSubDir"
+                Copy-Item -Path "$firstSubDir/*" -Destination "$artifactDir/RandomGen" -Recurse -Force
+                Write-Host "Files copied from first subdirectory"
+              } else {
+                Write-Error "No files or subdirectories found in build output directory"
+                exit 1
+              }
+            }
+          }
+        shell: pwsh
+      
+      - name: Create ZIP archive
+        run: |
+          $artifactDir = "artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          $zipFile = "RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
+          
           # Create the zip file
-          $zipPath = "artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
-          Compress-Archive -Path "$publishDir/*" -DestinationPath $zipPath -Force
-
+          Compress-Archive -Path "$artifactDir/RandomGen" -DestinationPath "artifacts/$zipFile"
+        shell: pwsh
+      
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ matrix.platform }}
-          path: artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip
-          retention-days: 5
-
+          path: artifacts/*.zip
+  
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -161,13 +205,6 @@ jobs:
           echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       
-      - name: Rename Release Artifacts
-        if: success()
-        run: |
-          mkdir -p release_assets
-          cp artifacts/build-artifacts-x64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip
-          cp artifacts/build-artifacts-arm64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip
-      
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -176,7 +213,23 @@ jobs:
           body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
           draft: false
           prerelease: false
-          tag_name: v${{ steps.get_version.outputs.VERSION }}
           files: |
-            release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip
-            release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip
+            artifacts/build-artifacts-x64/*.zip
+            artifacts/build-artifacts-arm64/*.zip
+            
+      - name: Create Latest Release Artifacts
+        if: success()
+        run: |
+          mkdir -p latest_release
+          cp artifacts/build-artifacts-x64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip latest_release/RandomGen-latest-x64.zip
+          cp artifacts/build-artifacts-arm64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip latest_release/RandomGen-latest-arm64.zip
+      
+      - name: Update Latest Release Artifacts
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          name: RandomGen v${{ steps.get_version.outputs.VERSION }}
+          tag_name: latest
+          files: |
+            latest_release/RandomGen-latest-x64.zip
+            latest_release/RandomGen-latest-arm64.zip
