@@ -5,8 +5,8 @@
 
   <!-- Badges -->
   <div style="margin: 20px 0;">
-    <a href="https://github.com/ruslanlap/RandomGen/releases/latest">
-      <img src="https://img.shields.io/github/v/release/ruslanlap/RandomGen?style=for-the-badge&label=Latest%20Version" alt="Latest Release">
+    <a href="https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0">
+      <img src="https://img.shields.io/badge/release-v1.0.0-blue?style=for-the-badge&label=Latest%20Version" alt="Latest Release">
     </a>
     <a href="https://github.com/ruslanlap/RandomGen/actions/workflows/build-and-release.yml">
       <img src="https://github.com/ruslanlap/RandomGen/actions/workflows/build-and-release.yml/badge.svg?style=for-the-badge" alt="Build Status">
@@ -29,30 +29,85 @@
     <img src="https://img.shields.io/badge/Windows%2011-Compatible-0078d7?style=flat-square&logo=windows" alt="Windows 11 Compatible">
     <img src="https://img.shields.io/badge/Automated%20Builds-CI%2FCD-2088FF?style=flat-square&logo=github-actions" alt="Automated Builds">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
+    <img src="https://img.shields.io/maintenance/yes/2025?style=flat-square" alt="Maintenance">
+    <img src="https://img.shields.io/badge/C%23-.NET%209-512BD4?style=flat-square" alt="C# .NET 9">
+    <a href="https://github.com/ruslanlap/RandomGen/stargazers">
+      <img src="https://img.shields.io/github/stars/ruslanlap/RandomGen?style=flat-square" alt="GitHub stars">
+    </a>
+    <a href="https://github.com/ruslanlap/RandomGen/issues">
+      <img src="https://img.shields.io/github/issues/ruslanlap/RandomGen?style=flat-square" alt="GitHub issues">
+    </a>
+    <img src="https://img.shields.io/github/last-commit/ruslanlap/RandomGen?style=flat-square" alt="Last Commit">
+    <img src="https://img.shields.io/github/commit-activity/m/ruslanlap/RandomGen?style=flat-square" alt="Commit Activity">
+    <img src="https://img.shields.io/badge/PowerToys-Run%20Plugin-0078d7?style=flat-square" alt="PowerToys Run Plugin">
+    <a href="https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20PowerToys%20Run%20Random%20Data%20Generator%20plugin!&url=https://github.com/ruslanlap/RandomGen">
+      <img src="https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fruslanlap%2FRandomGen" alt="Tweet">
+    </a>
   </div>
 
   <div style="margin: 20px 0;">
-    <a href="https://github.com/ruslanlap/RandomGen/releases/latest">
+    <a href="https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0">
       <img src="https://img.shields.io/badge/Download_Now-2088FF?style=for-the-badge&logo=github&logoColor=white&labelColor=24292f" alt="Download Now">
     </a>
   </div>
 </div>
 
+## 📊 Download Statistics
+
+<div align="center">
+  <img src="https://img.shields.io/github/downloads/ruslanlap/RandomGen/total?style=for-the-badge&label=Total%20Downloads" alt="Total Downloads">
+  <img src="https://img.shields.io/github/downloads/ruslanlap/RandomGen/latest/total?style=for-the-badge&label=Latest%20Release" alt="Latest Release Downloads">
+</div>
+
 ## 🎥 Demo
 
 <div align="center">
-  <img src="assets/demo-randomgen.gif" width="80%" alt="Main Demo" style="margin-bottom: 15px;">
-  <div>
-    <img src="assets/demo-randomgen-password.gif" width="48%" alt="Password Generation">
-    <img src="assets/demo-randomgen-pin-color.gif" width="48%" alt="PIN and Color Generation">
+  <!-- Main Overview Demo -->
+  <div style="margin-bottom: 25px;">
+    <p><strong>Overview of RandomGen commands</strong></p>
+    <img src="assets/demo-randomgen.gif" width="800" alt="Main Demo showing various RandomGen commands">
   </div>
-  <div style="margin-top: 15px;">
-    <img src="assets/demo-randomgen-address-date.gif" width="48%" alt="Address and Date Generation">
-    <img src="assets/demo-randomgen-guid.gif" width="48%" alt="GUID Generation">
+  
+  <!-- Password and PIN demos -->
+  <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
+    <div style="width: 48%;">
+      <p><strong>Command: <code>rnd password 16</code></strong></p>
+      <p>Generate a secure 16-character password</p>
+      <img src="assets/demo-randomgen-password.gif" width="800" alt="Password Generation Demo">
+    </div>
+    <div style="width: 48%;">
+      <p><strong>Commands: <code>rnd pin 6</code> and <code>rnd color</code></strong></p>
+      <p>Generate a 6-digit PIN and random hex color</p>
+      <img src="assets/demo-randomgen-pin-color.gif" width="800" alt="PIN and Color Generation Demo">
+    </div>
   </div>
-  <div style="margin-top: 15px;">
-    <img src="assets/demo-randomgen-name.gif" width="48%" alt="Name Generation">
-    <img src="assets/demo-randomgen-num.gif" width="48%" alt="Number Generation">
+  
+  <!-- Address/Date and GUID demos -->
+  <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
+    <div style="width: 48%;">
+      <p><strong>Commands: <code>rnd address</code> and <code>rnd date</code></strong></p>
+      <p>Generate a random address and date</p>
+      <img src="assets/demo-randomgen-address-date.gif" width="800" alt="Address and Date Generation Demo">
+    </div>
+    <div style="width: 48%;">
+      <p><strong>Command: <code>rnd guid</code></strong></p>
+      <p>Generate a random GUID/UUID</p>
+      <img src="assets/demo-randomgen-guid.gif" width="800" alt="GUID Generation Demo">
+    </div>
+  </div>
+  
+  <!-- Name and Number demos -->
+  <div style="display: flex; justify-content: space-between;">
+    <div style="width: 48%;">
+      <p><strong>Command: <code>rnd name</code></strong></p>
+      <p>Generate a random person name</p>
+      <img src="assets/demo-randomgen-name.gif" width="800" alt="Name Generation Demo">
+    </div>
+    <div style="width: 48%;">
+      <p><strong>Command: <code>rnd number 1-1000</code></strong></p>
+      <p>Generate a random number between 1 and 1000</p>
+      <img src="assets/demo-randomgen-num.gif" width="800" alt="Number Generation Demo">
+    </div>
   </div>
 </div>
 
@@ -101,7 +156,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 
 ## 🚀 Quick Start
 
-1. **Download** the latest release from the [Releases page](https://github.com/ruslanlap/RandomGen/releases/latest)
+1. **Download** the latest release from the [Releases page](https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0)
 2. **Extract** the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
@@ -177,7 +232,7 @@ rnd lorem 25
 ### Installation Steps
 
 #### Method 1: Using the Release Package
-1. Download the latest release from the [Releases page](https://github.com/ruslanlap/RandomGen/releases/latest)
+1. Download the latest release from the [Releases page](https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0)
 2. Extract the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
