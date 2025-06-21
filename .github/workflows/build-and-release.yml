@@ -56,25 +56,26 @@ jobs:
 
       - name: Publish
         run: |
-          # Clean up old artifacts
-          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue publish
-          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue artifacts
+          $publishDir = "publish/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          $pluginDir = "$publishDir/Community.PowerToys.Run.Plugin.RandomGen"
           
-          # Publish for current platform
-          dotnet publish "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj" `
-            -c Release `
-            -r ${{ matrix.runtime }} `
-            -p:PublishSingleFile=false `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
-            -p:IncludeAllContentForSelfExtract=true `
-            --self-contained true `
-            -p:Version=${{ steps.get_version.outputs.VERSION }} `
-            -o "publish/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
-
+          # Create the plugin directory
+          New-Item -ItemType Directory -Path $pluginDir -Force
+          
+          # Copy the plugin files from the build output
+          $buildOutput = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/bin/${{ matrix.platform }}/Release/net9.0-windows10.0.22621.0"
+          Copy-Item -Path "$buildOutput/*" -Destination $pluginDir -Recurse -Force
+          
+          # Ensure the plugin.json and Images are copied
+          Copy-Item -Path "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/plugin.json" -Destination $pluginDir -Force
+          if (Test-Path "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Images") {
+              Copy-Item -Path "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Images" -Destination $pluginDir -Recurse -Force
+          }
+          
           # Create the zip file
           $zipPath = "artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
           New-Item -ItemType Directory -Path "artifacts" -Force
-          Compress-Archive -Path "publish/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}/*" -DestinationPath $zipPath -Force
+          Compress-Archive -Path "$publishDir/*" -DestinationPath $zipPath -Force
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
