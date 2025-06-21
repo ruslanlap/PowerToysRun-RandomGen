@@ -66,9 +66,6 @@ jobs:
           # Create the artifact directory
           New-Item -ItemType Directory -Force -Path $artifactDir
           
-          # Create RandomGen subfolder
-          New-Item -ItemType Directory -Force -Path "$artifactDir/RandomGen"
-          
           # Define the direct path to the build output
           $buildOutput = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/bin/${{ matrix.platform }}/Release"
           
@@ -99,7 +96,9 @@ jobs:
           $files = Get-ChildItem -Path $buildOutput -File
           if ($files.Count -gt 0) {
             Write-Host "Found $($files.Count) files in build output directory. Copying directly..."
-            Copy-Item -Path "$buildOutput/*" -Destination "$artifactDir/RandomGen" -Recurse -Force
+            # Create the plugin directory structure
+            New-Item -ItemType Directory -Force -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen"
+            Copy-Item -Path "$buildOutput/*" -Destination "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -Recurse -Force
             Write-Host "Files copied successfully"
           } else {
             # Look for a .NET runtime folder
@@ -109,7 +108,9 @@ jobs:
             
             if ($runtimeFolder) {
               Write-Host "Found runtime folder: $runtimeFolder"
-              Copy-Item -Path "$runtimeFolder/*" -Destination "$artifactDir/RandomGen" -Recurse -Force
+              # Create the plugin directory structure
+              New-Item -ItemType Directory -Force -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen"
+              Copy-Item -Path "$runtimeFolder/*" -Destination "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -Recurse -Force
               Write-Host "Files copied successfully from runtime folder"
             } else {
               # If no runtime folder, check for any subdirectories
@@ -117,7 +118,9 @@ jobs:
               if ($subDirs.Count -gt 0) {
                 $firstSubDir = $subDirs[0].FullName
                 Write-Host "No runtime folder found, but found subdirectory: $firstSubDir"
-                Copy-Item -Path "$firstSubDir/*" -Destination "$artifactDir/RandomGen" -Recurse -Force
+                # Create the plugin directory structure
+                New-Item -ItemType Directory -Force -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen"
+                Copy-Item -Path "$firstSubDir/*" -Destination "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -Recurse -Force
                 Write-Host "Files copied from first subdirectory"
               } else {
                 Write-Error "No files or subdirectories found in build output directory"
@@ -130,10 +133,11 @@ jobs:
       - name: Create ZIP archive
         run: |
           $artifactDir = "artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          
           $zipFile = "RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
           
           # Create the zip file
-          Compress-Archive -Path "$artifactDir/RandomGen" -DestinationPath "artifacts/$zipFile"
+          Compress-Archive -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -DestinationPath "artifacts/$zipFile"
         shell: pwsh
       
       - name: Upload build artifacts
@@ -217,7 +221,7 @@ jobs:
             artifacts/build-artifacts-x64/*.zip
             artifacts/build-artifacts-arm64/*.zip
             
-      - name: Create Version-Specific Release Artifacts
+      - name: Prepare Release Artifacts
         if: success()
         run: |
           mkdir -p release_assets

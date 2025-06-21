@@ -77,12 +77,12 @@
   <!-- Password and PIN demos -->
   <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
     <div style="width: 48%;">
-      <p><strong>Command: <code>rnd password 16</code></strong></p>
+      <p><strong>Command: <code>rd password 16</code></strong></p>
       <p>Generate a secure 16-character password</p>
       <img src="assets/demo-randomgen-password.gif" width="800" alt="Password Generation Demo">
     </div>
     <div style="width: 48%;">
-      <p><strong>Commands: <code>rnd pin 6</code> and <code>rnd color</code></strong></p>
+      <p><strong>Commands: <code>rd pin 6</code> and <code>rd color</code></strong></p>
       <p>Generate a 6-digit PIN and random hex color</p>
       <img src="assets/demo-randomgen-pin-color.gif" width="800" alt="PIN and Color Generation Demo">
     </div>
@@ -91,12 +91,12 @@
   <!-- Address/Date and GUID demos -->
   <div style="display: flex; justify-content: space-between; margin-bottom: 25px;">
     <div style="width: 48%;">
-      <p><strong>Commands: <code>rnd address</code> and <code>rnd date</code></strong></p>
+      <p><strong>Commands: <code>rd address</code> and <code>rd date</code></strong></p>
       <p>Generate a random address and date</p>
       <img src="assets/demo-randomgen-address-date.gif" width="800" alt="Address and Date Generation Demo">
     </div>
     <div style="width: 48%;">
-      <p><strong>Command: <code>rnd guid</code></strong></p>
+      <p><strong>Command: <code>rd guid</code></strong></p>
       <p>Generate a random GUID/UUID</p>
       <img src="assets/demo-randomgen-guid.gif" width="800" alt="GUID Generation Demo">
     </div>
@@ -105,12 +105,12 @@
   <!-- Name and Number demos -->
   <div style="display: flex; justify-content: space-between;">
     <div style="width: 48%;">
-      <p><strong>Command: <code>rnd name</code></strong></p>
+      <p><strong>Command: <code>rd name</code></strong></p>
       <p>Generate a random person name</p>
       <img src="assets/demo-randomgen-name.gif" width="800" alt="Name Generation Demo">
     </div>
     <div style="width: 48%;">
-      <p><strong>Command: <code>rnd number 1-1000</code></strong></p>
+      <p><strong>Command: <code>rd number 1-1000</code></strong></p>
       <p>Generate a random number between 1 and 1000</p>
       <img src="assets/demo-randomgen-num.gif" width="800" alt="Number Generation Demo">
     </div>
@@ -153,7 +153,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 ### Technical Highlights
 
 - **Plugin ID:** `EFADBA167C1B41D8A7426A7DF808D28E`
-- **Action Keyword:** `rnd`
+- **Action Keyword:** `rd`
 - **Thread-Safe Design** - Optimized for performance with thread-local Faker instances
 - **Smart Caching** - Improved performance with intelligent result caching
 - **Cryptographically Secure** - Uses `System.Security.Cryptography.RandomNumberGenerator` for secure random generation
@@ -169,52 +169,52 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
    ```
 3. **Restart PowerToys**
 4. Press `Alt+Space` to open PowerToys Run
-5. Type `rnd` followed by what you want to generate (e.g., `rnd password`)
+5. Type `rd` followed by what you want to generate (e.g., `rd password`)
 
 ## 🔍 Usage
 
 ### Basic Commands
 
-Use the activation keyword `rnd` followed by the data type you want to generate:
+Use the activation keyword `rd` followed by the data type you want to generate:
 
 | Command | Example | Description |
 |---------|---------|-------------|
-| `rnd password [length]` | `rnd password 16` | Generate a secure password (default: 12 chars) |
-| `rnd pwd [length]` | `rnd pwd 16` | Alias for password command |
-| `rnd pin [length]` | `rnd pin 6` | Generate a numeric PIN (default: 4 digits) |
-| `rnd email` | `rnd email` | Generate a random email address |
-| `rnd name` | `rnd name` | Generate a random full name |
-| `rnd address` | `rnd address` | Generate a random address |
-| `rnd phone` | `rnd phone` | Generate a random phone number |
-| `rnd company` | `rnd company` | Generate a random company name |
-| `rnd lorem [count]` | `rnd lorem 25` | Generate lorem ipsum text (default: 10 words) |
-| `rnd number [min-max]` | `rnd number 1-1000` | Generate a random number (default: 1-100) |
-| `rnd num [min-max]` | `rnd num 1-1000` | Alias for number command |
-| `rnd date` | `rnd date` | Generate a random date |
-| `rnd guid` | `rnd guid` | Generate a random GUID/UUID |
-| `rnd uuid` | `rnd uuid` | Alias for guid command |
-| `rnd color` | `rnd color` | Generate a random hex color |
-| `rnd url` | `rnd url` | Generate a random URL |
-| `rnd creditcard` | `rnd creditcard` | Generate a random credit card number (test use only) |
-| `rnd credit` | `rnd credit` | Alias for creditcard command |
+| `rd password [length]` | `rd password 16` | Generate a secure password (default: 12 chars) |
+| `rd pwd [length]` | `rd pwd 16` | Alias for password command |
+| `rd pin [length]` | `rd pin 6` | Generate a numeric PIN (default: 4 digits) |
+| `rd email` | `rd email` | Generate a random email address |
+| `rd name` | `rd name` | Generate a random full name |
+| `rd address` | `rd address` | Generate a random address |
+| `rd phone` | `rd phone` | Generate a random phone number |
+| `rd company` | `rd company` | Generate a random company name |
+| `rd lorem [count]` | `rd lorem 25` | Generate lorem ipsum text (default: 10 words) |
+| `rd number [min-max]` | `rd number 1-1000` | Generate a random number (default: 1-100) |
+| `rd num [min-max]` | `rd num 1-1000` | Alias for number command |
+| `rd date` | `rd date` | Generate a random date |
+| `rd guid` | `rd guid` | Generate a random GUID/UUID |
+| `rd uuid` | `rd uuid` | Alias for guid command |
+| `rd color` | `rd color` | Generate a random hex color |
+| `rd url` | `rd url` | Generate a random URL |
+| `rd creditcard` | `rd creditcard` | Generate a random credit card number (test use only) |
+| `rd credit` | `rd credit` | Alias for creditcard command |
 
 ### Examples
 
 ```bash
 # Generate a 16-character password
-rnd password 16
+rd password 16
 
 # Generate a 6-digit PIN
-rnd pin 6
+rd pin 6
 
 # Generate a random email address
-rnd email
+rd email
 
 # Generate a random number between 1 and 1000
-rnd number 1-1000
+rd number 1-1000
 
 # Generate 25 words of lorem ipsum text
-rnd lorem 25
+rd lorem 25
 ```
 
 ### Advanced Features
@@ -256,7 +256,7 @@ rnd lorem 25
 4. Enable the plugin in PowerToys Settings → PowerToys Run → Plugin Manager
 
 ### Verifying Installation
-After installation, press `Alt+Space` to open PowerToys Run, then type `rnd` to see if the plugin is working correctly.
+After installation, press `Alt+Space` to open PowerToys Run, then type `rd` to see if the plugin is working correctly.
 
 ## 🧩 Requirements
 
