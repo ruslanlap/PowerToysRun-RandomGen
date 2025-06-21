@@ -1,0 +1,14 @@
+{
+  "ID": "EFADBA167C1B41D8A7426A7DF808D28E",
+  "ActionKeyword": "rd",
+  "IsGlobal": false,
+  "Name": "RandomGen",
+  "Author": "ruslanlap",
+  "Version": "1.0.1",
+  "Language": "csharp",
+  "Website": "https://github.com/ruslanlap/PowerToysRun-RandomGen",
+  "ExecuteFileName": "Community.PowerToys.Run.Plugin.RandomGen.dll",
+  "IcoPathDark": "Images\\randomgen.dark.png",
+  "IcoPathLight": "Images\\randomgen.light.png",
+  "DynamicLoading": false
+}

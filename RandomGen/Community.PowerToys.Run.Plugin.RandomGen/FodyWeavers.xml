@@ -1,0 +1,13 @@
+<Weavers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FodyWeavers.xsd">
+  <Costura>
+    <!-- Включити тільки Bogus.dll -->
+    <IncludeAssemblies>
+      Bogus
+    </IncludeAssemblies>
+    <!-- Не створювати тимчасові файли -->
+    <CreateTemporaryAssemblies>false</CreateTemporaryAssemblies>
+    <!-- Ігнорувати PowerToys збірки через Unmanaged32Assemblies та Unmanaged64Assemblies -->
+    <Unmanaged32Assemblies />
+    <Unmanaged64Assemblies />
+  </Costura>
+</Weavers>
