@@ -51,101 +51,38 @@ jobs:
             echo "IS_TAG=false" >> $GITHUB_OUTPUT
           fi
       
-      - name: Debug Output
+      - name: Build
+        run: dotnet build --configuration Release --no-restore -p:Platform=${{ matrix.platform }} -p:PlatformTarget=${{ matrix.platform }} -p:Version=${{ steps.get_version.outputs.VERSION }} -p:FileVersion=${{ steps.get_version.outputs.VERSION }} -p:AssemblyVersion=${{ steps.get_version.outputs.VERSION }}.0
+
+       - name: Publish
         run: |
-          Get-ChildItem -Path "RandomGen" -Recurse -Directory | Where-Object { $_.Name -eq "Release" } | ForEach-Object { Write-Host $_.FullName }
-        shell: pwsh
-      
-      - name: Create output directory
-        run: mkdir -p artifacts
-      
-      - name: Copy build output to artifacts directory
-        run: |
-          $artifactDir = "artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          # Clean up old artifacts
+          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue publish
+          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue artifacts
           
-          # Create the artifact directory
-          New-Item -ItemType Directory -Force -Path $artifactDir
-          
-          # Define the direct path to the build output
-          $buildOutput = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/bin/${{ matrix.platform }}/Release"
-          
-          Write-Host "Using build output directory: $buildOutput"
-          
-          # Check if the directory exists
-          if (-not (Test-Path $buildOutput)) {
-            Write-Host "Build output directory not found at expected path. Searching for it..."
-            $buildOutput = Get-ChildItem -Path "RandomGen" -Recurse -Directory | 
-                           Where-Object { $_.Name -eq "Release" -and $_.FullName -like "*${{ matrix.platform }}*" } | 
-                           Select-Object -First 1 -ExpandProperty FullName
-            
-            if ($buildOutput) {
-              Write-Host "Found build output directory: $buildOutput"
-            } else {
-              Write-Error "Could not find any Release directory for platform ${{ matrix.platform }}"
-              exit 1
-            }
-          }
-          
-          # Check if build output exists before proceeding
-          if (-not (Test-Path $buildOutput)) {
-            Write-Error "Build output directory not found"
-            exit 1
-          }
-          
-          # Check for files directly in the build output directory
-          $files = Get-ChildItem -Path $buildOutput -File
-          if ($files.Count -gt 0) {
-            Write-Host "Found $($files.Count) files in build output directory. Copying directly..."
-            # Create the plugin directory structure
-            New-Item -ItemType Directory -Force -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen"
-            Copy-Item -Path "$buildOutput/*" -Destination "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -Recurse -Force
-            Write-Host "Files copied successfully"
-          } else {
-            # Look for a .NET runtime folder
-            $runtimeFolder = Get-ChildItem -Path $buildOutput -Directory | 
-                             Where-Object { $_.Name -like "net*-windows*" } | 
-                             Select-Object -First 1 -ExpandProperty FullName
-            
-            if ($runtimeFolder) {
-              Write-Host "Found runtime folder: $runtimeFolder"
-              # Create the plugin directory structure
-              New-Item -ItemType Directory -Force -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen"
-              Copy-Item -Path "$runtimeFolder/*" -Destination "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -Recurse -Force
-              Write-Host "Files copied successfully from runtime folder"
-            } else {
-              # If no runtime folder, check for any subdirectories
-              $subDirs = Get-ChildItem -Path $buildOutput -Directory
-              if ($subDirs.Count -gt 0) {
-                $firstSubDir = $subDirs[0].FullName
-                Write-Host "No runtime folder found, but found subdirectory: $firstSubDir"
-                # Create the plugin directory structure
-                New-Item -ItemType Directory -Force -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen"
-                Copy-Item -Path "$firstSubDir/*" -Destination "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -Recurse -Force
-                Write-Host "Files copied from first subdirectory"
-              } else {
-                Write-Error "No files or subdirectories found in build output directory"
-                exit 1
-              }
-            }
-          }
-        shell: pwsh
-      
-      - name: Create ZIP archive
-        run: |
-          $artifactDir = "artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
-          
-          $zipFile = "RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
-          
+          # Publish for current platform
+          dotnet publish "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj" `
+            -c Release `
+            -r ${{ matrix.runtime }} `
+            -p:PublishSingleFile=false `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:IncludeAllContentForSelfExtract=true `
+            --self-contained true `
+            -p:Version=${{ steps.get_version.outputs.VERSION }} `
+            -o "publish/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+
           # Create the zip file
-          Compress-Archive -Path "$artifactDir/Community.PowerToys.Run.Plugin.RandomGen" -DestinationPath "artifacts/$zipFile"
-        shell: pwsh
-      
+          $zipPath = "artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
+          New-Item -ItemType Directory -Path "artifacts" -Force
+          Compress-Archive -Path "publish/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}/*" -DestinationPath $zipPath -Force
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ matrix.platform }}
-          path: artifacts/*.zip
-  
+          path: artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip
+          retention-days: 5
+
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -186,16 +123,16 @@ jobs:
           1. Download the ZIP file for your platform (x64 or ARM64)  
           2. Extract to `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\`  
           3. Restart PowerToys  
-          4. Start using with `Alt+Space` then type `rnd`
+          4. Start using with `Alt+Space` then type `rd`
           
           ## 🔍 Quick Commands
           
           | Command                     | Description                         |
           |-----------------------------|-------------------------------------|
-          | `rnd password [length]`     | Generate a secure password          |
-          | `rnd pin [length]`          | Generate a numeric PIN              |
-          | `rnd email`                 | Generate a random email address     |
-          | `rnd guid`                  | Generate a random GUID/UUID         |
+          | `rd password [length]`     | Generate a secure password          |
+          | `rd pin [length]`          | Generate a numeric PIN              |
+          | `rd email`                 | Generate a random email address     |
+          | `rd guid`                  | Generate a random GUID/UUID         |
           
           ## 🙏 Thank You
           
