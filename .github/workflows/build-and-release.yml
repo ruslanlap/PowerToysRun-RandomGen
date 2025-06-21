@@ -167,7 +167,7 @@ jobs:
           # 📝 RandomGen v${{ steps.get_version.outputs.VERSION }}
           
           <p align="center">
-            <img src="https://github.com/ruslanlap/RandomGen/blob/main/assets/randomgen.logo.png" width="128px" alt="RandomGen Logo" />
+            <img src="https://github.com/ruslanlap/RandomGen/blob/master/assets/randomgen.logo.png" width="128px" alt="RandomGen Logo" />
           </p>
           
           ## ✨ What's New
