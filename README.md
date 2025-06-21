@@ -46,10 +46,10 @@
   </div>
 
   <div style="margin: 20px 0;">
-    <a href="https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-x64.zip">
+    <a href="https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-x64.zip">
       <img src="https://img.shields.io/badge/Download_x64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download x64 Version">
     </a>
-    <a href="https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-ARM64.zip">
+    <a href="https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-arm64.zip">
       <img src="https://img.shields.io/badge/Download_ARM64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download ARM64 Version">
     </a>
     <a href="https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0">
@@ -162,7 +162,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 
 ## 🚀 Quick Start
 
-1. **Download** the latest release from the [Releases page](https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0)
+1. **Download** the latest release for your architecture ([x64](https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-x64.zip) or [ARM64](https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-arm64.zip))
 2. **Extract** the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
@@ -238,7 +238,7 @@ rnd lorem 25
 ### Installation Steps
 
 #### Method 1: Using the Release Package
-1. Download the latest release from the [Releases page](https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0)
+1. Download the latest release for your architecture ([x64](https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-x64.zip) or [ARM64](https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-arm64.zip))
 2. Extract the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\

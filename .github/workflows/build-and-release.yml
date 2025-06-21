@@ -217,19 +217,19 @@ jobs:
             artifacts/build-artifacts-x64/*.zip
             artifacts/build-artifacts-arm64/*.zip
             
-      - name: Create Latest Release Artifacts
+      - name: Create Version-Specific Release Artifacts
         if: success()
         run: |
-          mkdir -p latest_release
-          cp artifacts/build-artifacts-x64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip latest_release/RandomGen-latest-x64.zip
-          cp artifacts/build-artifacts-arm64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip latest_release/RandomGen-latest-arm64.zip
+          mkdir -p release_assets
+          cp artifacts/build-artifacts-x64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-x64.zip
+          cp artifacts/build-artifacts-arm64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-arm64.zip
       
-      - name: Update Latest Release Artifacts
+      - name: Add Version-Specific Assets to Release
         if: success()
         uses: softprops/action-gh-release@v2
         with:
           name: RandomGen v${{ steps.get_version.outputs.VERSION }}
-          tag_name: latest
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
           files: |
-            latest_release/RandomGen-latest-x64.zip
-            latest_release/RandomGen-latest-arm64.zip
+            release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-x64.zip
+            release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-arm64.zip
