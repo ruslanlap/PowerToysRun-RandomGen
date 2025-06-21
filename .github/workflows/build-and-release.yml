@@ -54,7 +54,7 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore -p:Platform=${{ matrix.platform }} -p:PlatformTarget=${{ matrix.platform }} -p:Version=${{ steps.get_version.outputs.VERSION }} -p:FileVersion=${{ steps.get_version.outputs.VERSION }} -p:AssemblyVersion=${{ steps.get_version.outputs.VERSION }}.0
 
-       - name: Publish
+      - name: Publish
         run: |
           # Clean up old artifacts
           Remove-Item -Recurse -Force -ErrorAction SilentlyContinue publish
