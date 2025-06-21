@@ -218,7 +218,7 @@ rd lorem 25
 ```
 
 ## ☕ Support
-Enjoying Video Downloader? ☕ Buy me a coffee to support development:
+Enjoying RandomGen? ☕ Buy me a coffee to support development:
 
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕️-FFDD00?style=for-the-badge&logo=buy-me-a-coffee)](https://ruslanlap.github.io/ruslanlap_buymeacoffe/)
 
