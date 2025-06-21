@@ -46,8 +46,14 @@
   </div>
 
   <div style="margin: 20px 0;">
+    <a href="https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-x64.zip">
+      <img src="https://img.shields.io/badge/Download_x64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download x64 Version">
+    </a>
+    <a href="https://github.com/ruslanlap/RandomGen/releases/download/v1.0.0/RandomGen-ARM64.zip">
+      <img src="https://img.shields.io/badge/Download_ARM64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download ARM64 Version">
+    </a>
     <a href="https://github.com/ruslanlap/RandomGen/releases/tag/v1.0.0">
-      <img src="https://img.shields.io/badge/Download_Now-2088FF?style=for-the-badge&logo=github&logoColor=white&labelColor=24292f" alt="Download Now">
+      <img src="https://img.shields.io/badge/All_Releases-2088FF?style=for-the-badge&logo=github&logoColor=white&labelColor=24292f" alt="All Releases">
     </a>
   </div>
 </div>
