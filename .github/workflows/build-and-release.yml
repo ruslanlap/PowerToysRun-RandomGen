@@ -209,6 +209,13 @@ jobs:
           echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
       
+      - name: Rename Release Artifacts
+        if: success()
+        run: |
+          mkdir -p release_assets
+          cp artifacts/build-artifacts-x64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip
+          cp artifacts/build-artifacts-arm64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip
+      
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -217,23 +224,7 @@ jobs:
           body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
           draft: false
           prerelease: false
-          files: |
-            artifacts/build-artifacts-x64/*.zip
-            artifacts/build-artifacts-arm64/*.zip
-            
-      - name: Prepare Release Artifacts
-        if: success()
-        run: |
-          mkdir -p release_assets
-          cp artifacts/build-artifacts-x64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-x64.zip
-          cp artifacts/build-artifacts-arm64/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-arm64.zip
-      
-      - name: Add Version-Specific Assets to Release
-        if: success()
-        uses: softprops/action-gh-release@v2
-        with:
-          name: RandomGen v${{ steps.get_version.outputs.VERSION }}
           tag_name: v${{ steps.get_version.outputs.VERSION }}
           files: |
-            release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-x64.zip
-            release_assets/RandomGen-${{ steps.get_version.outputs.VERSION }}-arm64.zip
+            release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip
+            release_assets/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip
