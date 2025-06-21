@@ -39,6 +39,9 @@ jobs:
       - name: Build
         run: dotnet build RandomGen/RandomGen.sln -c Release -p:Platform="${{ matrix.platform }}"
       
+      - name: Publish
+        run: dotnet publish RandomGen/RandomGen.sln -c Release -p:Platform="${{ matrix.platform }}" -o ./Publish/${{ matrix.platform }}
+      
       - name: Get version
         id: get_version
         shell: bash
@@ -70,7 +73,12 @@ jobs:
           New-Item -ItemType Directory -Force -Path "$artifactDir/RandomGen"
           
           # Define the direct path to the build output
-          $buildOutput = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/bin/${{ matrix.platform }}/Release"
+          $buildOutput = "./Publish/${{ matrix.platform }}"
+          
+          # Fallback to searching for the correct path if the direct path doesn't exist
+          if (-not (Test-Path $buildOutput)) {
+            $buildOutput = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/bin/Release/net9.0-windows10.0.22621.0/win-${{ matrix.platform }}/publish"
+          }
           
           Write-Host "Using build output directory: $buildOutput"
           
