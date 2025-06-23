@@ -14,7 +14,7 @@
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases">
       <img src="https://img.shields.io/github/downloads/ruslanlap/PowerToysRun-RandomGen/total?style=for-the-badge" alt="Total Downloads">
     </a>
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/blob/main/LICENSE">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/blob/master/LICENSE">
       <img src="https://img.shields.io/github/license/ruslanlap/PowerToysRun-RandomGen?style=for-the-badge" alt="License">
     </a>
   </div>
@@ -46,10 +46,10 @@
   </div>
 
   <div style="margin: 20px 0;">
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-x64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-latest-x64.zip">
       <img src="https://img.shields.io/badge/Download_x64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download x64 Version">
     </a>
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-arm64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-latest-arm64.zip">
       <img src="https://img.shields.io/badge/Download_ARM64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download ARM64 Version">
     </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases">
