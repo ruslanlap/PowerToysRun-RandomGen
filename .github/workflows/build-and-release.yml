@@ -35,17 +35,14 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Build
+        shell: pwsh
         run: |
-          dotnet build \
-            RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj \
-            -c Release -p:Platform="${{ matrix.platform }}"
+          dotnet build RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj -c Release -p:Platform="${{ matrix.platform }}"
 
       - name: Publish
+        shell: pwsh
         run: |
-          dotnet publish \
-            RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj \
-            -c Release -p:Platform="${{ matrix.platform }}" \
-            -o ./Publish/${{ matrix.platform }}
+          dotnet publish RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj -c Release -p:Platform="${{ matrix.platform }}" -o ./Publish/${{ matrix.platform }}
 
       - name: Get version
         id: get_version
