@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/randomgen.logo.png" width="200" alt="RandomGen Logo" style="margin-bottom: 20px;">
-  <h1>🎲 RandomGen for PowerToys Run</h1>
-  <h3>Generate random data instantly with a single keystroke</h3>
+  <h1>🎲 RandomGen for PowerToys Run  🎲</h1>
+  <h3>Generate random data instantly with a single keystroke. Cool features like smart PIN generation, secure password creation, and more.</h3>
 
   <!-- Badges -->
   <div style="margin: 20px 0;">
