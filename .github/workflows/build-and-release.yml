@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      # - main
-      # - master
+      - main
+      - master
     tags:
       - 'v*'
 
