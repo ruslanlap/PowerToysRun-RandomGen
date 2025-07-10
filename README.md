@@ -23,6 +23,7 @@
     <img src="https://img.shields.io/badge/Supported%20Data%20Types-14%2B-success?style=flat-square" alt="Supported Data Types">
     <img src="https://img.shields.io/badge/Platform-Windows%2010%2B-0078d7?style=flat-square" alt="Windows 10+">
     <img src="https://img.shields.io/badge/PowerToys-v0.75%2B-0078d7?style=flat-square" alt="PowerToys v0.75+">
+    <img src="https://img.shields.io/badge/PTRUN-Compliant-brightgreen?style=flat-square" alt="PTRUN Compliant">
     <img src="https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square" alt=".NET 9.0">
     <img src="https://img.shields.io/badge/Arch-x64%20%7C%20ARM64-0078d7?style=flat-square" alt="x64 | ARM64">
     <img src="https://img.shields.io/badge/Code%20Quality-A-brightgreen?style=flat-square" alt="Code Quality">
@@ -46,10 +47,10 @@
   </div>
 
   <div style="margin: 20px 0;">
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-v1.0.0-x64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.1-x64.zip">
       <img src="https://img.shields.io/badge/Download_x64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download x64 Version">
     </a>
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-v1.0.0-arm64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.1-arm64.zip">
       <img src="https://img.shields.io/badge/Download_ARM64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download ARM64 Version">
     </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases">
@@ -162,7 +163,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 
 ## 🚀 Quick Start
 
-1. **Download** the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-arm64.zip))
+1. **Download** the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-arm64.zip))
 2. **Extract** the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
@@ -243,7 +244,7 @@ Enjoying RandomGen? ☕ Buy me a coffee to support development:
 ### Installation Steps
 
 #### Method 1: Using the Release Package
-1. Download the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.0/RandomGen-1.0.0-arm64.zip))
+1. Download the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-arm64.zip))
 2. Extract the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
@@ -271,6 +272,17 @@ After installation, press `Alt+Space` to open PowerToys Run, then type `rd` to s
 - Approximately 2MB of disk space
 
 ## 🛠️ Building from Source
+
+### PTRUN Compliance
+
+This plugin is fully compliant with PowerToys Run validation requirements:
+
+- ✅ **PTRUN1301**: Package naming follows the `<name>-<version>-<platform>.zip` convention
+- ✅ **PTRUN1303**: SHA256 checksums are generated for all packages
+- ✅ **PTRUN1401**: Plugin version in metadata matches filename version
+- ✅ **PTRUN1402**: No unnecessary PowerToys dependencies included
+
+The GitHub Actions workflow automatically ensures compliance with these requirements.
 
 ### Prerequisites
 - [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
