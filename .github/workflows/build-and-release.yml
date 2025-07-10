@@ -70,6 +70,16 @@ jobs:
           New-Item -ItemType Directory -Force -Path $artifactDir
           New-Item -ItemType Directory -Force -Path "$artifactDir/RandomGen"
           
+          # Copy plugin.json file to ensure metadata is included in the package
+          $pluginJsonSrc = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/plugin.json"
+          if (Test-Path $pluginJsonSrc) {
+            Write-Host "Copying plugin.json from $pluginJsonSrc to $artifactDir/RandomGen/"
+            Copy-Item -Path $pluginJsonSrc -Destination "$artifactDir/RandomGen/" -Force
+          } else {
+            Write-Error "plugin.json not found at $pluginJsonSrc"
+            exit 1
+          }
+          
           # Copy Images folder (icons) to artifact directory to ensure correct icons in release
           $imagesSrc = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Images"
           $imagesDst = "$artifactDir/RandomGen/Images"
