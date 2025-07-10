@@ -1,0 +1,111 @@
+name: Snyk Security Scan
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly scan on Sundays
+
+jobs:
+  security:
+    runs-on: windows-latest
+    permissions:
+      security-events: write  # Required for GitHub Code Scanning integration
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for better vulnerability detection
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Using Snyk Action instead of CLI for better GitHub integration
+      - name: Run Snyk to check for vulnerabilities (.NET)
+        uses: snyk/actions/dotnet@master
+        continue-on-error: true  # Don't fail the build yet
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium --all-projects --detection-depth=6 --sarif-file-output=snyk-dotnet.sarif
+
+      # Check for vulnerabilities in GitHub Actions workflows
+      - name: Run Snyk IaC scan
+        uses: snyk/actions/iac@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --sarif-file-output=snyk-iac.sarif
+
+      # Combine SARIF files
+      - name: Combine SARIF files
+        run: |
+          New-Item -ItemType Directory -Force -Path ./snyk-reports
+          Get-ChildItem -Filter snyk-*.sarif | ForEach-Object { Copy-Item $_.FullName -Destination ./snyk-reports/ }
+          
+      # Upload findings to GitHub Code Scanning
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ./snyk-reports
+          category: snyk
+
+      # Run Snyk Monitor to continuously monitor the project
+      - name: Monitor project in Snyk
+        uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --all-projects --org=${{ vars.SNYK_ORG_ID || 'default' }} --project-tags=repo:${{ github.repository }},branch:${{ github.ref_name }}
+
+      # Check for outdated dependencies and report versions
+      - name: Check for outdated dependencies
+        uses: snyk/actions/dotnet@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --all-projects --json-file-output=outdated-deps.json
+
+      # Parse and output dependency versions
+      - name: Report dependency versions
+        run: |
+          if (Test-Path -Path "outdated-deps.json") {
+            Write-Host "::group::Dependency Versions Report"
+            $deps = Get-Content -Raw -Path "outdated-deps.json" | ConvertFrom-Json
+            foreach ($project in $deps) {
+              Write-Host "Project: $($project.projectName)"
+              Write-Host "Dependencies:"
+              foreach ($dep in $project.vulnerabilities) {
+                Write-Host "  - $($dep.packageName): Current=$($dep.from[0]), Latest=$($dep.upgradePath[0])"
+              }
+              Write-Host ""
+            }
+            Write-Host "::endgroup::"
+          }
+
+      # Fail the build if high severity issues are found
+      - name: Check for high severity issues
+        uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --fail-on=upgradable --all-projects
