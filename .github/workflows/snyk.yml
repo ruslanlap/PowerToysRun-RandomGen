@@ -24,15 +24,16 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      # Use official Snyk Action for .NET scanning
+      # Run Snyk to check for vulnerabilities and generate SARIF file
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/dotnet@master
-        continue-on-error: true # Don't fail the build yet
+        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          command: test
           args: --severity-threshold=medium --all-projects --sarif-file-output=snyk.sarif
 
-      # Debug - List files
+      # Debug - List files to verify SARIF file exists
       - name: List SARIF files
         run: |
           echo "Files in current directory:"
@@ -42,22 +43,25 @@ jobs:
           ls -la
 
       # Upload SARIF file to GitHub Code Scanning
-      - name: Upload SARIF file
+      - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: snyk.sarif
-          category: snyk
 
-      # Monitor project in Snyk
+      # Monitor project in Snyk for continuous vulnerability checking
       - name: Monitor project in Snyk
         uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
           args: --all-projects
           
-      # Check for high severity issues
+      # Check for high severity issues that should fail the build
       - name: Check for high severity issues
         uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: test
           args: --severity-threshold=high --fail-on=upgradable --all-projects
