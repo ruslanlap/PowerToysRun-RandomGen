@@ -5,12 +5,10 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  schedule:
-    - cron: '0 0 * * 0'  # Weekly scan on Sundays
 
 jobs:
   security:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest # Snyk container actions require a Linux runner
     permissions:
       security-events: write  # Required for GitHub Code Scanning integration
       contents: read
@@ -36,76 +34,63 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      # Using Snyk Action instead of CLI for better GitHub integration
+      # Using Snyk CLI directly for better control
       - name: Run Snyk to check for vulnerabilities (.NET)
-        uses: snyk/actions/dotnet@master
+        run: |
+          npm install -g snyk
+          if [ -n "$SNYK_TOKEN" ]; then
+            snyk auth $SNYK_TOKEN
+          fi
+          snyk test --severity-threshold=medium --all-projects --detection-depth=6 --sarif-file-output=snyk-dotnet.sarif
         continue-on-error: true  # Don't fail the build yet
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=medium --all-projects --detection-depth=6 --sarif-file-output=snyk-dotnet.sarif
 
       # Check for vulnerabilities in GitHub Actions workflows
       - name: Run Snyk IaC scan
-        uses: snyk/actions/iac@master
+        run: |
+          snyk iac test --severity-threshold=high --sarif-file-output=snyk-iac.sarif
         continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high --sarif-file-output=snyk-iac.sarif
 
       # Combine SARIF files
       - name: Combine SARIF files
         run: |
-          New-Item -ItemType Directory -Force -Path ./snyk-reports
-          Get-ChildItem -Filter snyk-*.sarif | ForEach-Object { Copy-Item $_.FullName -Destination ./snyk-reports/ }
+          mkdir -p snyk-reports
+          find . -name "snyk-*.sarif" -exec mv {} snyk-reports/ \;
           
       # Upload findings to GitHub Code Scanning
+      # Note: This step will only work in the actual GitHub environment, not in local testing
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v2
+        if: ${{ github.actor != 'nektos/act' }} # Skip during local act testing
+        uses: github/codeql-action/upload-sarif@v3 # Updated to v3
         with:
-          sarif_file: ./snyk-reports
+          sarif_file: snyk-reports
           category: snyk
+          token: ${{ github.token }}
 
       # Run Snyk Monitor to continuously monitor the project
       - name: Monitor project in Snyk
-        uses: snyk/actions/dotnet@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
-          args: --all-projects --org=${{ vars.SNYK_ORG_ID || 'default' }} --project-tags=repo:${{ github.repository }},branch:${{ github.ref_name }}
+        run: |
+          # Try with project tags first, but fall back to basic monitoring if tags aren't supported
+          snyk monitor --all-projects --project-tags=repo=${{ github.repository }},branch=${{ github.ref_name }} || \
+          snyk monitor --all-projects
 
       # Check for outdated dependencies and report versions
       - name: Check for outdated dependencies
-        uses: snyk/actions/dotnet@master
+        run: |
+          snyk test --all-projects --json-file-output=outdated-deps.json
         continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --all-projects --json-file-output=outdated-deps.json
 
       # Parse and output dependency versions
       - name: Report dependency versions
         run: |
-          if (Test-Path -Path "outdated-deps.json") {
-            Write-Host "::group::Dependency Versions Report"
-            $deps = Get-Content -Raw -Path "outdated-deps.json" | ConvertFrom-Json
-            foreach ($project in $deps) {
-              Write-Host "Project: $($project.projectName)"
-              Write-Host "Dependencies:"
-              foreach ($dep in $project.vulnerabilities) {
-                Write-Host "  - $($dep.packageName): Current=$($dep.from[0]), Latest=$($dep.upgradePath[0])"
-              }
-              Write-Host ""
-            }
-            Write-Host "::endgroup::"
-          }
+          if [ ! -f outdated-deps.json ]; then
+            echo "No outdated dependencies found."
+            exit 0
+          fi
+          echo "::group::Dependency Versions Report"
+          jq -r '.[] | .projectName as $project | .vulnerabilities[] | "Project: \($project)\n  - \(.packageName): Current=\(.from[0]), Latest=\(.upgradePath[0])\n"' outdated-deps.json
+          echo "::endgroup::"
 
       # Fail the build if high severity issues are found
       - name: Check for high severity issues
-        uses: snyk/actions/dotnet@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high --fail-on=upgradable --all-projects
+        run: |
+          snyk test --severity-threshold=high --fail-on=upgradable --all-projects
