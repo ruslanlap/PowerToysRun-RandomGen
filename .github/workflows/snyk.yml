@@ -36,25 +36,37 @@ jobs:
 
       # Using Snyk CLI directly for better control
       - name: Run Snyk to check for vulnerabilities (.NET)
+        continue-on-error: true  # Don't fail the build yet
         run: |
+          mkdir -p snyk-reports
           npm install -g snyk
           if [ -n "$SNYK_TOKEN" ]; then
             snyk auth $SNYK_TOKEN
           fi
-          snyk test --severity-threshold=medium --all-projects --detection-depth=6 --sarif-file-output=snyk-dotnet.sarif
-        continue-on-error: true  # Don't fail the build yet
+          snyk test --severity-threshold=medium --all-projects --detection-depth=6 --sarif-file-output=snyk-reports/snyk-dotnet.sarif
 
       # Check for vulnerabilities in GitHub Actions workflows
       - name: Run Snyk IaC scan
         run: |
-          snyk iac test --severity-threshold=high --sarif-file-output=snyk-iac.sarif
+          snyk iac test --severity-threshold=high --sarif-file-output=snyk-reports/snyk-iac.sarif
         continue-on-error: true
 
       # Combine SARIF files
       - name: Combine SARIF files
         run: |
+          # List all SARIF files for debugging
+          echo "SARIF files before moving:"
+          find . -name "*.sarif" -type f -ls
+          
+          # Ensure directory exists
           mkdir -p snyk-reports
-          find . -name "snyk-*.sarif" -exec mv {} snyk-reports/ \;
+          
+          # Copy SARIF files to the reports directory
+          find . -name "*.sarif" -type f -exec cp {} snyk-reports/ \;
+          
+          # List files in the reports directory
+          echo "Files in snyk-reports directory:"
+          ls -la snyk-reports/
           
       # Upload findings to GitHub Code Scanning
       # Note: This step will only work in the actual GitHub environment, not in local testing
@@ -62,7 +74,7 @@ jobs:
         if: ${{ github.actor != 'nektos/act' }} # Skip during local act testing
         uses: github/codeql-action/upload-sarif@v3 # Updated to v3
         with:
-          sarif_file: snyk-reports
+          sarif_file: snyk-reports/snyk-dotnet.sarif
           category: snyk
           token: ${{ github.token }}
 
