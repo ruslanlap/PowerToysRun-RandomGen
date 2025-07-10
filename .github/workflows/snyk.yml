@@ -8,101 +8,56 @@ on:
 
 jobs:
   security:
-    runs-on: ubuntu-latest # Snyk container actions require a Linux runner
+    runs-on: ubuntu-latest
     permissions:
       security-events: write  # Required for GitHub Code Scanning integration
       contents: read
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history for better vulnerability detection
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
 
-      - name: Cache NuGet packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-
       - name: Restore dependencies
         run: dotnet restore
 
-      # Using Snyk CLI directly for better control
-      - name: Run Snyk to check for vulnerabilities (.NET)
-        continue-on-error: true  # Don't fail the build yet
-        run: |
-          mkdir -p snyk-reports
-          npm install -g snyk
-          if [ -n "$SNYK_TOKEN" ]; then
-            snyk auth $SNYK_TOKEN
-          fi
-          snyk test --severity-threshold=medium --all-projects --detection-depth=6 --sarif-file-output=snyk-reports/snyk-dotnet.sarif
-
-      # Check for vulnerabilities in GitHub Actions workflows
-      - name: Run Snyk IaC scan
-        run: |
-          snyk iac test --severity-threshold=high --sarif-file-output=snyk-reports/snyk-iac.sarif
-        continue-on-error: true
-
-      # Combine SARIF files
-      - name: Combine SARIF files
-        run: |
-          # List all SARIF files for debugging
-          echo "SARIF files before moving:"
-          find . -name "*.sarif" -type f -ls
-          
-          # Ensure directory exists
-          mkdir -p snyk-reports
-          
-          # Copy SARIF files to the reports directory
-          find . -name "*.sarif" -type f -exec cp {} snyk-reports/ \;
-          
-          # List files in the reports directory
-          echo "Files in snyk-reports directory:"
-          ls -la snyk-reports/
-          
-      # Upload findings to GitHub Code Scanning
-      # Note: This step will only work in the actual GitHub environment, not in local testing
-      - name: Upload SARIF file
-        if: ${{ github.actor != 'nektos/act' }} # Skip during local act testing
-        uses: github/codeql-action/upload-sarif@v3 # Updated to v3
+      # Use official Snyk Action for .NET scanning
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/dotnet@master
+        continue-on-error: true # Don't fail the build yet
         with:
-          sarif_file: snyk-reports/snyk-dotnet.sarif
+          command: test
+          args: --severity-threshold=medium --all-projects --sarif-file-output=snyk.sarif
+
+      # Debug - List files
+      - name: List SARIF files
+        run: |
+          echo "Files in current directory:"
+          find . -name "*.sarif" -type f
+          
+          echo "Contents of current directory:"
+          ls -la
+
+      # Upload SARIF file to GitHub Code Scanning
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
           category: snyk
-          token: ${{ github.token }}
 
-      # Run Snyk Monitor to continuously monitor the project
+      # Monitor project in Snyk
       - name: Monitor project in Snyk
-        run: |
-          # Try with project tags first, but fall back to basic monitoring if tags aren't supported
-          snyk monitor --all-projects --project-tags=repo=${{ github.repository }},branch=${{ github.ref_name }} || \
-          snyk monitor --all-projects
-
-      # Check for outdated dependencies and report versions
-      - name: Check for outdated dependencies
-        run: |
-          snyk test --all-projects --json-file-output=outdated-deps.json
-        continue-on-error: true
-
-      # Parse and output dependency versions
-      - name: Report dependency versions
-        run: |
-          if [ ! -f outdated-deps.json ]; then
-            echo "No outdated dependencies found."
-            exit 0
-          fi
-          echo "::group::Dependency Versions Report"
-          jq -r '.[] | .projectName as $project | .vulnerabilities[] | "Project: \($project)\n  - \(.packageName): Current=\(.from[0]), Latest=\(.upgradePath[0])\n"' outdated-deps.json
-          echo "::endgroup::"
-
-      # Fail the build if high severity issues are found
+        uses: snyk/actions/dotnet@master
+        with:
+          command: monitor
+          args: --all-projects
+          
+      # Check for high severity issues
       - name: Check for high severity issues
-        run: |
-          snyk test --severity-threshold=high --fail-on=upgradable --all-projects
+        uses: snyk/actions/dotnet@master
+        with:
+          command: test
+          args: --severity-threshold=high --fail-on=upgradable --all-projects
