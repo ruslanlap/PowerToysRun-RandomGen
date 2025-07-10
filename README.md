@@ -171,6 +171,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 3. **Restart PowerToys**
 4. Press `Alt+Space` to open PowerToys Run
 5. Type `rd` followed by what you want to generate (e.g., `rd password`)
+6. Best practice: Press the Space button to regenerate a new value.
 
 ## 🔍 Usage
 
