@@ -28,6 +28,8 @@ jobs:
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/dotnet@master
         continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=medium --all-projects --sarif-file-output=snyk.sarif
 
@@ -48,6 +50,8 @@ jobs:
       # Monitor project in Snyk for continuous vulnerability checking
       - name: Monitor project in Snyk
         uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
           args: --all-projects
@@ -55,6 +59,8 @@ jobs:
       # Check for high severity issues that should fail the build
       - name: Check for high severity issues
         uses: snyk/actions/dotnet@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: test
           args: --severity-threshold=high --fail-on=upgradable --all-projects
