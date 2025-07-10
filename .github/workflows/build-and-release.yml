@@ -34,16 +34,6 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Build
-        shell: pwsh
-        run: |
-          dotnet build RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj -c Release -p:Platform="${{ matrix.platform }}"
-
-      - name: Publish
-        shell: pwsh
-        run: |
-          dotnet publish RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj -c Release -p:Platform="${{ matrix.platform }}" -o ./Publish/${{ matrix.platform }}
-
       - name: Get version
         id: get_version
         shell: bash
@@ -56,21 +46,61 @@ jobs:
             echo "IS_TAG=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Update plugin.json version
+        run: |
+          $version = "${{ steps.get_version.outputs.VERSION }}"
+          $pluginJsonPath = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/plugin.json"
+          
+          if (Test-Path $pluginJsonPath) {
+            $content = Get-Content $pluginJsonPath -Raw | ConvertFrom-Json
+            $content.Version = $version
+            $content | ConvertTo-Json -Depth 10 | Set-Content $pluginJsonPath -Encoding UTF8
+            Write-Host "Updated plugin.json version to: $version"
+          }
+        shell: pwsh
+
+      - name: Build
+        shell: pwsh
+        run: |
+          dotnet build RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj -c Release -p:Platform="${{ matrix.platform }}"
+
+      - name: Publish
+        shell: pwsh
+        run: |
+          dotnet publish RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj -c Release -p:Platform="${{ matrix.platform }}" -o ./Publish/${{ matrix.platform }}
+
       - name: Create artifacts directory
         run: mkdir -p artifacts
 
       - name: Copy build output to artifacts directory
         shell: pwsh
         run: |
-          $artifactDir = "artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          $artifactDir = "artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
           New-Item -ItemType Directory -Force -Path "$artifactDir/RandomGen"
           Copy-Item -Path "./Publish/${{ matrix.platform }}/*" -Destination "$artifactDir/RandomGen" -Recurse -Force
+          
+          # Remove unnecessary PowerToys DLLs that are provided by the host
+          $unnecessaryDlls = @(
+            "PowerToys.Common.UI.dll",
+            "PowerToys.ManagedCommon.dll", 
+            "PowerToys.Settings.UI.Lib.dll",
+            "Wox.Infrastructure.dll",
+            "Wox.Plugin.dll"
+          )
+          
+          foreach ($dll in $unnecessaryDlls) {
+            $dlls = Get-ChildItem -Path "$artifactDir/RandomGen" -Recurse -Filter $dll
+            foreach ($item in $dlls) {
+              Write-Host "Removing unnecessary DLL: $($item.FullName)"
+              Remove-Item $item.FullName -Force
+            }
+          }
 
       - name: Create ZIP archive
         shell: pwsh
         run: |
-          $artifactDir = "artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
-          $zipFile     = "RandomGen-v${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
+          $artifactDir = "artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
+          $zipFile     = "RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
           Compress-Archive -Path "$artifactDir/RandomGen" -DestinationPath "artifacts/$zipFile"
 
       - name: Upload build artifacts
@@ -88,21 +118,51 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
-          merge-multiple: true
+          path: downloaded-artifacts
 
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      # Debug step to see what files are available
+      - name: List downloaded artifacts
+        run: |
+          echo "Listing downloaded artifacts directory:"
+          ls -la downloaded-artifacts
+          echo "Listing x64 artifacts:"
+          ls -la downloaded-artifacts/build-artifacts-x64 || echo "No x64 artifacts found"
+          echo "Listing ARM64 artifacts:"
+          ls -la downloaded-artifacts/build-artifacts-arm64 || echo "No ARM64 artifacts found"
+
+      # Copy artifacts to the expected location with the correct names
+      - name: Prepare artifacts for release
+        run: |
+          mkdir -p release-artifacts
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          cp downloaded-artifacts/build-artifacts-x64/RandomGen-${VERSION}-x64.zip release-artifacts/ || echo "Failed to copy x64 artifact"
+          cp downloaded-artifacts/build-artifacts-arm64/RandomGen-${VERSION}-arm64.zip release-artifacts/RandomGen-${VERSION}-ARM64.zip || echo "Failed to copy ARM64 artifact"
+          echo "Listing release artifacts:"
+          ls -la release-artifacts
+        
+      - name: Generate SHA256 checksums
+        run: |
+          cd release-artifacts
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          sha256sum RandomGen-${VERSION}-x64.zip | tr 'a-f' 'A-F' > RandomGen-${VERSION}-x64.zip.sha256
+          sha256sum RandomGen-${VERSION}-ARM64.zip | tr 'a-f' 'A-F' > RandomGen-${VERSION}-ARM64.zip.sha256
+          
+          # Create combined checksums.txt file
+          echo "SHA256 Checksums for RandomGen Plugin v${VERSION}" > checksums.txt
+          echo "Generated on: $(date -u)" >> checksums.txt
+          echo "" >> checksums.txt
+          cat RandomGen-${VERSION}-x64.zip.sha256 >> checksums.txt
+          cat RandomGen-${VERSION}-ARM64.zip.sha256 >> checksums.txt
 
       - name: Prepare Release Notes
         id: release_notes
         run: |
-          cat > release_notes.md << 'EOL'
-          # 🎲 RandomGen v${{ steps.get_version.outputs.VERSION }} - Unleashed!
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          cat > release_notes.md << EOL
+          # 🎲 RandomGen v${VERSION} - Unleashed!
           
           <p align="center">
             <img src="https://github.com/ruslanlap/PowerToysRun-RandomGen/blob/master/assets/randomgen.logo.png" width="128px" alt="RandomGen Logo" />
@@ -149,26 +209,29 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          name: RandomGen v${{ steps.get_version.outputs.VERSION }}
+          name: RandomGen v${GITHUB_REF#refs/tags/v}
           body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
           draft: false
           prerelease: false
           files: |
-            artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip
-            artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip
+            release-artifacts/RandomGen-${GITHUB_REF#refs/tags/v}-x64.zip
+            release-artifacts/RandomGen-${GITHUB_REF#refs/tags/v}-ARM64.zip
+            release-artifacts/RandomGen-${GITHUB_REF#refs/tags/v}-x64.zip.sha256
+            release-artifacts/RandomGen-${GITHUB_REF#refs/tags/v}-ARM64.zip.sha256
+            release-artifacts/checksums.txt
 
       - name: Create Latest Release Artifacts
         if: success()
         run: |
           mkdir -p latest_release
-          cp artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-x64.zip latest_release/RandomGen-latest-x64.zip
-          cp artifacts/RandomGen-v${{ steps.get_version.outputs.VERSION }}-arm64.zip latest_release/RandomGen-latest-arm64.zip
+          cp release-artifacts/RandomGen-${GITHUB_REF#refs/tags/v}-x64.zip latest_release/RandomGen-latest-x64.zip
+          cp release-artifacts/RandomGen-${GITHUB_REF#refs/tags/v}-ARM64.zip latest_release/RandomGen-latest-arm64.zip
 
       - name: Update Latest Release Artifacts
         if: success()
         uses: softprops/action-gh-release@v2
         with:
-          name: RandomGen v${{ steps.get_version.outputs.VERSION }}
+          name: RandomGen v${GITHUB_REF#refs/tags/v}
           tag_name: latest
           files: |
             latest_release/RandomGen-latest-x64.zip
