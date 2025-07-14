@@ -159,9 +159,27 @@ jobs:
           )
           
           foreach ($dll in $unnecessaryDlls) {
-            $dlls = Get-ChildItem -Path "$artifactDir/RandomGen" -Recurse -Filter $dll
+            $dlls = Get-ChildItem -Path "$artifactDir/RandomGen" -Recurse | Where-Object { $_.Name -in $unnecessaryDlls }
+          if ($dlls) {
             foreach ($item in $dlls) {
               Write-Host "Removing unnecessary DLL: $($item.FullName)"
+              Remove-Item $item.FullName -Force
+            }
+          }
+          
+          # Remove unnecessary PowerToys PDB files that are not needed for release
+          $unnecessaryPdbs = @(
+            "PowerToys.Common.UI.pdb",
+            "PowerToys.ManagedCommon.pdb",
+            "PowerToys.Settings.UI.Lib.pdb",
+            "Wox.Infrastructure.pdb",
+            "Wox.Plugin.pdb"
+          )
+
+          $pdbs = Get-ChildItem -Path "$artifactDir/RandomGen" -Recurse | Where-Object { $_.Name -in $unnecessaryPdbs }
+          if ($pdbs) {
+            foreach ($item in $pdbs) {
+              Write-Host "Removing unnecessary PDB: $($item.FullName)"
               Remove-Item $item.FullName -Force
             }
           }
