@@ -47,10 +47,10 @@
   </div>
 
   <div style="margin: 20px 0;">
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.1-x64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.2-x64.zip">
       <img src="https://img.shields.io/badge/Download_x64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download x64 Version">
     </a>
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.1-arm64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.2-arm64.zip">
       <img src="https://img.shields.io/badge/Download_ARM64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download ARM64 Version">
     </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases">
