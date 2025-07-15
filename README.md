@@ -173,6 +173,32 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 5. Type `rd` followed by what you want to generate (e.g., `rd password`)
 6. Best practice: Press the Space button to regenerate a new value.
 
+## 📋 Changelog
+
+### v1.0.2 - Enhanced Password Generator Options
+![Password Generator Options](assets/demo-password-options.png)
+
+1. **Enhanced Option Syntax Support**
+   - Now supports multiple ways to specify options:
+     - Exclusion: `-upper`, `-special`, `-numeric`, `-lower`
+     - Inclusion: `+upper`, `+special`, `+numeric`, `+lower`
+     - Natural language: `noupper`, `no-special`, `nonumbers`
+
+2. **Better Error Handling**
+   - Ensures at least one character type is always enabled
+   - Handles edge cases where all types are disabled
+   - Validates password length accommodates required character types
+
+3. **Improved Display**
+   - Better subtitle showing what's excluded: (16 chars, no upper,special)
+   - Clearer option descriptions in tooltips
+
+4. **Usage Examples**
+   - `rd password 16 -special` → 16-char password without symbols
+   - `rd password 22 -numeric` → 22-char password without numbers
+   - `rd pwd 12 -upper -special` → 12-char password with only lowercase + numbers
+   - `rd password 20 noupper` → 20-char password without uppercase letters
+
 ## 🔍 Usage
 
 ### Basic Commands
