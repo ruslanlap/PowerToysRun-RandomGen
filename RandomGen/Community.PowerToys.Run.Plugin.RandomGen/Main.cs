@@ -111,19 +111,19 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                 }
 
                 var command = searchTerms[0].ToLowerInvariant();
-                var parameter = searchTerms.Length > 1 ? searchTerms[1] : null;
+                var parameters = searchTerms.Length > 1 ? string.Join(" ", searchTerms.Skip(1)) : null;
 
                 // Check for exact matches first
                 return command switch
                 {
-                    "password" or "pwd" => [GeneratePassword(parameter)],
+                    "password" or "pwd" => [GeneratePassword(parameters)],
                     "email" => [GenerateEmail()],
                     "name" => [GenerateName()],
                     "address" => [GenerateAddress()],
                     "phone" => [GeneratePhone()],
                     "company" => [GenerateCompany()],
-                    "lorem" => [GenerateLorem(parameter)],
-                    "number" or "num" => [GenerateNumber(parameter)],
+                    "lorem" => [GenerateLorem(parameters)],
+                    "number" or "num" => [GenerateNumber(parameters)],
                     "date" => [GenerateDate()],
                     "guid" or "uuid" => [GenerateGuid()],
                     "color" => [GenerateColor()],
@@ -624,7 +624,7 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                 {
                     settings.Length = length;
                 }
-                // Parse character type options
+                // Parse character type options - exclusions
                 else if (lowerPart.StartsWith("-"))
                 {
                     switch (lowerPart)
@@ -643,6 +643,7 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                             break;
                     }
                 }
+                // Parse character type options - inclusions
                 else if (lowerPart.StartsWith("+"))
                 {
                     switch (lowerPart)
@@ -661,6 +662,25 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                             break;
                     }
                 }
+                // Parse options without prefix for convenience
+                else
+                {
+                    switch (lowerPart)
+                    {
+                        case "nolower" or "no-lower":
+                            settings.IncludeLowercase = false;
+                            break;
+                        case "noupper" or "no-upper":
+                            settings.IncludeUppercase = false;
+                            break;
+                        case "nonumeric" or "no-numeric" or "nonumbers" or "no-numbers":
+                            settings.IncludeNumeric = false;
+                            break;
+                        case "nospecial" or "no-special" or "nosymbols" or "no-symbols":
+                            settings.IncludeSpecial = false;
+                            break;
+                    }
+                }
             }
 
             // Ensure at least one character type is enabled
@@ -676,14 +696,14 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
 
         private string GetPasswordOptionsText(PasswordSettings settings)
         {
-            var options = new List<string>();
+            var excluded = new List<string>();
             
-            if (!settings.IncludeLowercase) options.Add("-lower");
-            if (!settings.IncludeUppercase) options.Add("-upper");
-            if (!settings.IncludeNumeric) options.Add("-numeric");
-            if (!settings.IncludeSpecial) options.Add("-special");
+            if (!settings.IncludeLowercase) excluded.Add("lower");
+            if (!settings.IncludeUppercase) excluded.Add("upper");
+            if (!settings.IncludeNumeric) excluded.Add("numeric");
+            if (!settings.IncludeSpecial) excluded.Add("special");
             
-            return string.Join(" ", options);
+            return excluded.Count > 0 ? $"no {string.Join(",", excluded)}" : "all types";
         }
 
         private string GetPasswordOptionsDescription(PasswordSettings settings)
@@ -731,8 +751,19 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                 guaranteedChars.Add(symbols[random.Next(symbols.Length)]);
             }
 
+            // Ensure we have characters to work with
+            if (availableChars.Length == 0)
+            {
+                availableChars.Append(lowercase + uppercase);
+                guaranteedChars.Add(lowercase[random.Next(lowercase.Length)]);
+                guaranteedChars.Add(uppercase[random.Next(uppercase.Length)]);
+            }
+
             var allChars = availableChars.ToString();
             var password = new StringBuilder();
+
+            // Ensure password length accommodates guaranteed characters
+            var finalLength = Math.Max(settings.Length, guaranteedChars.Count);
 
             // Add guaranteed characters first
             foreach (var ch in guaranteedChars)
@@ -741,7 +772,7 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
             }
 
             // Fill the rest randomly
-            for (int i = guaranteedChars.Count; i < settings.Length; i++)
+            for (int i = guaranteedChars.Count; i < finalLength; i++)
             {
                 password.Append(allChars[random.Next(allChars.Length)]);
             }
