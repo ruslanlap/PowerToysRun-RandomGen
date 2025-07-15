@@ -163,7 +163,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 
 ## 🚀 Quick Start
 
-1. **Download** the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-arm64.zip))
+1. **Download** the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-arm64.zip))
 2. **Extract** the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
@@ -245,7 +245,7 @@ Enjoying RandomGen? ☕ Buy me a coffee to support development:
 ### Installation Steps
 
 #### Method 1: Using the Release Package
-1. Download the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.1/RandomGen-1.0.1-arm64.zip))
+1. Download the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-arm64.zip))
 2. Extract the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\

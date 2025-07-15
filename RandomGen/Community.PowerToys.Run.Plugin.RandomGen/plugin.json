@@ -4,7 +4,7 @@
   "IsGlobal": false,
   "Name": "RandomGen",
   "Author": "ruslanlap",
-  "Version": "1.0.1",
+  "Version": "1.0.2",
   "Language": "csharp",
   "Website": "https://github.com/ruslanlap/PowerToysRun-RandomGen",
   "ExecuteFileName": "Community.PowerToys.Run.Plugin.RandomGen.dll",
