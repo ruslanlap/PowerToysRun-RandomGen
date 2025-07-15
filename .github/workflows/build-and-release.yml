@@ -1,17 +1,19 @@
-name: Build and Release RandomGen Plugin
+name: ⚡ Build & Release RandomGen PowerToys Plugin
 
 on:
   push:
     tags:
       - 'v*'
 
-# Permissions for GITHUB_TOKEN (principle of least privilege)
+env:
+  PLUGIN_DIR: RandomGen/Community.PowerToys.Run.Plugin.RandomGen
+  ARTIFACT_PREFIX: RandomGen
+
 permissions:
-  contents: write  # Needed for creating releases
+  contents: write
   issues: read
   pull-requests: read
 
-# Add restrictions for parallel runs
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -22,16 +24,23 @@ jobs:
     strategy:
       matrix:
         platform: [x64, arm64]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('RandomGen/**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      
+
       - name: Get version
         id: get_version
         shell: bash
@@ -43,257 +52,130 @@ jobs:
             echo "VERSION=$(date +'%Y.%m.%d')-$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
             echo "IS_TAG=false" >> $GITHUB_OUTPUT
           fi
-      
-      - name: Update plugin.json version
-        run: |
-          $version = "${{ steps.get_version.outputs.VERSION }}"
-          $pluginJsonPath = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/plugin.json"
-          
-          if (Test-Path $pluginJsonPath) {
-            $content = Get-Content $pluginJsonPath -Raw | ConvertFrom-Json
-            $content.Version = $version
-            $content | ConvertTo-Json -Depth 10 | Set-Content $pluginJsonPath -Encoding UTF8
-            Write-Host "Updated plugin.json version to: $version"
-          }
-        shell: pwsh
-      
-      - name: Build
-        run: dotnet build RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Community.PowerToys.Run.Plugin.RandomGen.csproj -c Release -p:Platform="${{ matrix.platform }}"
-      
-      - name: Create output directory
-        run: mkdir -p artifacts
-      
-      - name: Copy build output to artifacts directory
-        run: |
-          $artifactDir = "artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
-          
-          New-Item -ItemType Directory -Force -Path $artifactDir
-          New-Item -ItemType Directory -Force -Path "$artifactDir/RandomGen"
-          
-          # Copy plugin.json file to ensure metadata is included in the package
-          $pluginJsonSrc = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/plugin.json"
-          if (Test-Path $pluginJsonSrc) {
-            Write-Host "Copying plugin.json from $pluginJsonSrc to $artifactDir/RandomGen/"
-            Copy-Item -Path $pluginJsonSrc -Destination "$artifactDir/RandomGen/" -Force
-          } else {
-            Write-Error "plugin.json not found at $pluginJsonSrc"
-            exit 1
-          }
-          
-          # Copy Images folder (icons) to artifact directory to ensure correct icons in release
-          $imagesSrc = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/Images"
-          $imagesDst = "$artifactDir/RandomGen/Images"
-          if (Test-Path $imagesSrc) {
-            Write-Host "Copying Images folder from $imagesSrc to $imagesDst"
-            Copy-Item -Path $imagesSrc -Destination $imagesDst -Recurse -Force
-          } else {
-            Write-Host "Images folder not found at $imagesSrc"
-          }
-          
-          # Define the direct path to the build output
-          $buildOutput = "RandomGen/Community.PowerToys.Run.Plugin.RandomGen/bin/${{ matrix.platform }}/Release"
-          
-          Write-Host "Using build output directory: $buildOutput"
-          
-          # Check if the directory exists
-          if (-not (Test-Path $buildOutput)) {
-            Write-Host "Build output directory not found at expected path. Searching for it..."
-            $buildOutput = Get-ChildItem -Path "RandomGen" -Recurse -Directory | 
-                           Where-Object { $_.Name -eq "Release" -and $_.FullName -like "*${{ matrix.platform }}*" } | 
-                           Select-Object -First 1 -ExpandProperty FullName
-            
-            if ($buildOutput) {
-              Write-Host "Found build output directory: $buildOutput"
-            } else {
-              Write-Error "Could not find any Release directory for platform ${{ matrix.platform }}"
-              exit 1
-            }
-          }
-          
-          # Check if build output exists before proceeding
-          if (-not (Test-Path $buildOutput)) {
-            Write-Error "Build output directory not found"
-            exit 1
-          }
-          
-          # Check for files directly in the build output directory
-          $files = Get-ChildItem -Path $buildOutput -File
-          if ($files.Count -gt 0) {
-            Write-Host "Found $($files.Count) files in build output directory. Copying directly..."
-            Get-ChildItem -Path $buildOutput -File | ForEach-Object {
-              Copy-Item -Path $_.FullName -Destination "$artifactDir/RandomGen" -Force
-            }
-            Write-Host "Files copied successfully"
-          } else {
-            # Look for a .NET runtime folder
-            $runtimeFolder = Get-ChildItem -Path $buildOutput -Directory | 
-                             Where-Object { $_.Name -like "net*-windows*" } | 
-                             Select-Object -First 1 -ExpandProperty FullName
-            
-            if ($runtimeFolder) {
-              Write-Host "Found runtime folder: $runtimeFolder"
-              Copy-Item -Path "$runtimeFolder\*" -Destination "$artifactDir/RandomGen" -Recurse -Force
-              Write-Host "Files copied successfully from runtime folder"
-            } else {
-              # If no runtime folder, check for any subdirectories
-              $subDirs = Get-ChildItem -Path $buildOutput -Directory
-              if ($subDirs.Count -gt 0) {
-                $firstSubDir = $subDirs[0].FullName
-                Write-Host "No runtime folder found, but found subdirectory: $firstSubDir"
-                Copy-Item -Path "$firstSubDir\*" -Destination "$artifactDir/RandomGen" -Recurse -Force
-                Write-Host "Files copied from first subdirectory"
-              } else {
-                Write-Error "No files or subdirectories found in build output directory"
-                exit 1
-              }
-            }
-          }
-          
-          # Remove unnecessary PowerToys DLLs and PDBs that are provided by the host
-          $unnecessaryFiles = @(
-            # DLLs
-            "PowerToys.Common.UI.dll",
-            "PowerToys.ManagedCommon.dll",
-            "PowerToys.Settings.UI.Lib.dll",
-            "Wox.Infrastructure.dll",
-            "Wox.Plugin.dll",
-            # PDBs
-            "PowerToys.Common.UI.pdb",
-            "PowerToys.ManagedCommon.pdb",
-            "PowerToys.Settings.UI.Lib.pdb",
-            "Wox.Infrastructure.pdb",
-            "Wox.Plugin.pdb"
-          )
 
-          $filesToRemove = Get-ChildItem -Path "$artifactDir/RandomGen" -Recurse | Where-Object { $_.Name -in $unnecessaryFiles }
-          if ($filesToRemove) {
-            foreach ($item in $filesToRemove) {
-              Write-Host "Removing unnecessary file: $($item.FullName)"
-              Remove-Item $item.FullName -Force
-            }
-          }
+      - name: 🚀 Build & stage plugin
         shell: pwsh
-      
-      - name: Create ZIP archive
         run: |
-          $artifactDir = "artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}"
-          $zipName = "RandomGen-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
-          # Create ZIP with RandomGen folder inside
-          Compress-Archive -Path "$artifactDir/RandomGen" -DestinationPath "artifacts/$zipName"
+          # 1. Inject version
+          $pluginJson = "${{ env.PLUGIN_DIR }}/plugin.json"
+          $content    = Get-Content $pluginJson -Raw | ConvertFrom-Json
+          $content.Version = "${{ steps.get_version.outputs.VERSION }}"
+          $content | ConvertTo-Json -Depth 10 | Set-Content $pluginJson -Encoding UTF8
+
+          # 2. Build
+          dotnet build "${{ env.PLUGIN_DIR }}/Community.PowerToys.Run.Plugin.RandomGen.csproj" `
+            -c Release `
+            -p:Platform="${{ matrix.platform }}"
+
+          # 3. Locate binaries
+          $outDir = "${{ env.PLUGIN_DIR }}/bin/${{ matrix.platform }}/Release"
+          $netDir = Get-ChildItem $outDir -Directory -Filter "net*-windows*" |
+                    Select-Object -First 1 -ExpandProperty FullName
+          if (-not $netDir) { throw "Build output not found" }
+
+          # 4. Stage folder
+          $stage = "artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}/${{ env.ARTIFACT_PREFIX }}"
+          New-Item $stage -ItemType Directory -Force | Out-Null
+
+          # 5. Copy files
+          Copy-Item "$netDir/*" $stage -Recurse -Exclude @(
+            "PowerToys*.dll","PowerToys*.pdb","Wox*.dll","Wox*.pdb"
+          )
+          Copy-Item $pluginJson $stage
+          Copy-Item "${{ env.PLUGIN_DIR }}/Images" $stage -Recurse -ErrorAction SilentlyContinue
+
+      - name: 📦 Zip & upload artifact
         shell: pwsh
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        run: |
+          $zip = "artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}.zip"
+          $src = "artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-${{ matrix.platform }}/${{ env.ARTIFACT_PREFIX }}"
+          Compress-Archive -Path $src -DestinationPath $zip
+
+      - uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ matrix.platform }}
           path: artifacts/*.zip
-  
+
   release:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Get version from tag
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-      
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: downloaded-artifacts
-      
-      # Debug step to see what files are available
-      - name: List downloaded artifacts
-        run: |
-          echo "Listing downloaded artifacts directory:"
-          ls -la downloaded-artifacts
-          echo "Listing x64 artifacts:"
-          ls -la downloaded-artifacts/build-artifacts-x64 || echo "No x64 artifacts found"
-          echo "Listing ARM64 artifacts:"
-          ls -la downloaded-artifacts/build-artifacts-arm64 || echo "No ARM64 artifacts found"
-      
-      # Copy artifacts to the expected location with the correct names
+
       - name: Prepare artifacts for release
         run: |
           mkdir -p release-artifacts
           VERSION="${{ steps.get_version.outputs.VERSION }}"
-          cp downloaded-artifacts/build-artifacts-x64/RandomGen-${VERSION}-x64.zip release-artifacts/ || echo "Failed to copy x64 artifact"
-          cp downloaded-artifacts/build-artifacts-arm64/RandomGen-${VERSION}-arm64.zip release-artifacts/ || echo "Failed to copy ARM64 artifact"
-          echo "Listing release artifacts:"
-          ls -la release-artifacts
-      
-      - name: Prepare Release Notes
+          cp downloaded-artifacts/build-artifacts-x64/${{ env.ARTIFACT_PREFIX }}-${VERSION}-x64.zip release-artifacts/
+          cp downloaded-artifacts/build-artifacts-arm64/${{ env.ARTIFACT_PREFIX }}-${VERSION}-arm64.zip release-artifacts/
+
+      - name: Prepare release notes
         id: release_notes
         run: |
           VERSION="${{ steps.get_version.outputs.VERSION }}"
           cat > release_notes.md << EOL
-          # 🎲 RandomGen v${VERSION} - Unleashed!
-          
+          # 🎲 RandomGen v${VERSION} – Unleashed!
           <p align="center">
-            <img src="https://github.com/ruslanlap/PowerToysRun-RandomGen/blob/master/assets/randomgen.logo.png" width="128px" alt="RandomGen Logo" />
+            <img src="https://github.com/ruslanlap/PowerToysRun-RandomGen/raw/master/assets/randomgen.logo.png" width="128" alt="RandomGen Logo"/>
           </p>
-          
-          ## ✨ What's New in this Epic Release
-          
-          - 🔐 **Enhanced Password Generator**: Customize your passwords with new options!
-            - Choose to include/exclude lowercase letters
-            - Choose to include/exclude uppercase letters
-            - Choose to include/exclude numbers
-            - Choose to include/exclude special characters
-          - 🚀 Turbocharged performance for lightning-fast randomness
-          - 🛡️ Squashed those pesky bugs that were hiding in the shadows
-          - 🔮 Magical new features to supercharge your productivity
-          - 🔧 PTRUN Compliance: All PowerToys Run linting issues resolved (PTRUN1301, PTRUN1303, PTRUN1401, PTRUN1402)
-          
-          ## 🧙‍♂️ Installation Magic
-          
-          1. 📦 Download the mystical ZIP file for your realm (x64 or ARM64)  
-          2. 🔓 Extract the arcane contents to \`%LOCALAPPDATA%\\Microsoft\\PowerToys\\PowerToys Run\\Plugins\\RandomGen\`  
-          3. 🔄 Summon a PowerToys restart to activate the spell  
-          4. ✨ Invoke the power with \`Alt+Space\` then conjure \`rd\` followed by your command
-          
-          ## ⚡ Spellbook of Commands
-          
-          | Incantation                 | What Magic It Performs                    |
-          |----------------------------|-------------------------------------------|
-          | `rd password [length]`     | Forge an unbreakable password             |
-          | `rd password [options]`    | Customize password with options (l,u,n,s) |
-          | `rd pin [length]`          | Conjure a mystical numeric PIN            |
-          | `rd guid`                  | Summon a unique dimensional GUID          |
-          | `rd number min-max`        | Roll cosmic dice within your range        |
-          | `rd name`                  | Generate an identity from the void        |
-          | `rd email`                 | Materialize a digital address             |
-          | `rd date`                  | Pluck a random day from the timeline      |
-          | `rd color`                 | Extract a chromatic hex essence           |
-          
-          ## 💫 Join the RandomGen Universe
-          
-          Your cosmic journey with RandomGen matters! Encountered a glitch in the matrix or have ideas to bend reality? [Open an issue](https://github.com/ruslanlap/PowerToysRun-RandomGen/issues) and shape the future!
-          
-          Crafted with ✨ cosmic energy ✨ by <a href="https://github.com/ruslanlap">ruslanlap</a>
+
+          ## ✨ What’s New
+          - 🔐 **Enhanced Password Generator** (customizable options)
+          - 🚀 Turbocharged performance
+          - 🛡️ Bug fixes & PTRUN compliance
+
+          ## 🧙‍♂️ Install
+          1. Download ZIP for your arch (x64 / ARM64)  
+          2. Extract to `%LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen`  
+          3. Restart PowerToys → press `Alt+Space` → type `rd <command>`
+
+          ## ⚡ Commands
+          | Incantation | Magic |
+          |-------------|-------|
+          | `rd password [len]` | Forge a password |
+          | `rd pin [len]` | Numeric PIN |
+          | `rd guid` | Fresh GUID |
+          | `rd number min-max` | Random number |
+          | `rd name` | Random name |
+          | `rd email` | Random email |
+          | `rd date` | Random date |
+          | `rd color` | Hex color |
+
+          ## 💫 Contribute
+          Found a bug or have an idea? [Open an issue](https://github.com/ruslanlap/PowerToysRun-RandomGen/issues).
+
+          Crafted with ✨ cosmic energy ✨ by [ruslanlap](https://github.com/ruslanlap)
           EOL
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
           cat release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-      
+
       - name: Generate SHA256 checksums
         run: |
           cd release-artifacts
           VERSION="${{ steps.get_version.outputs.VERSION }}"
-          sha256sum RandomGen-${VERSION}-x64.zip | tr 'a-f' 'A-F' > RandomGen-${VERSION}-x64.zip.sha256
-          sha256sum RandomGen-${VERSION}-arm64.zip | tr 'a-f' 'A-F' > RandomGen-${VERSION}-arm64.zip.sha256
-          
-          # Create combined checksums.txt file
-          echo "SHA256 Checksums for RandomGen Plugin v${VERSION}" > checksums.txt
-          echo "Generated on: $(date -u)" >> checksums.txt
-          echo "" >> checksums.txt
-          cat RandomGen-${VERSION}-x64.zip.sha256 >> checksums.txt
-          cat RandomGen-${VERSION}-arm64.zip.sha256 >> checksums.txt
-      
+          for f in *.zip; do
+            sha256sum "$f" | tee "$f.sha256"
+          done
+          {
+            echo "SHA256 Checksums for RandomGen Plugin v${VERSION}"
+            echo "Generated on: $(date -u)"
+            echo
+            cat *.sha256
+          } > checksums.txt
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -302,10 +184,9 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            release-artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-x64.zip
-            release-artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-arm64.zip
-            release-artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-x64.zip.sha256
-            release-artifacts/RandomGen-${{ steps.get_version.outputs.VERSION }}-arm64.zip.sha256
+            release-artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-x64.zip
+            release-artifacts/${{ env.ARTIFACT_PREFIX }}-${{ steps.get_version.outputs.VERSION }}-arm64.zip
+            release-artifacts/*.sha256
             release-artifacts/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
