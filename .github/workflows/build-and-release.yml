@@ -239,7 +239,11 @@ jobs:
           
           ## ✨ What's New in this Epic Release
           
-          <!-- Add your release highlights here -->
+          - 🔐 **Enhanced Password Generator**: Customize your passwords with new options!
+            - Choose to include/exclude lowercase letters
+            - Choose to include/exclude uppercase letters
+            - Choose to include/exclude numbers
+            - Choose to include/exclude special characters
           - 🚀 Turbocharged performance for lightning-fast randomness
           - 🛡️ Squashed those pesky bugs that were hiding in the shadows
           - 🔮 Magical new features to supercharge your productivity
@@ -254,16 +258,17 @@ jobs:
           
           ## ⚡ Spellbook of Commands
           
-          | Incantation           | What Magic It Performs              |
-          |------------------------|-----------------------------------|
-          | \`rd password [length]\` | Forge an unbreakable password       |
-          | \`rd pin [length]\`      | Conjure a mystical numeric PIN      |
-          | \`rd guid\`              | Summon a unique dimensional GUID    |
-          | \`rd number min-max\`    | Roll cosmic dice within your range  |
-          | \`rd name\`              | Generate an identity from the void  |
-          | \`rd email\`             | Materialize a digital address       |
-          | \`rd date\`              | Pluck a random day from the timeline|
-          | \`rd color\`             | Extract a chromatic hex essence     |
+          | Incantation                 | What Magic It Performs                    |
+          |----------------------------|-------------------------------------------|
+          | `rd password [length]`     | Forge an unbreakable password             |
+          | `rd password [options]`    | Customize password with options (l,u,n,s) |
+          | `rd pin [length]`          | Conjure a mystical numeric PIN            |
+          | `rd guid`                  | Summon a unique dimensional GUID          |
+          | `rd number min-max`        | Roll cosmic dice within your range        |
+          | `rd name`                  | Generate an identity from the void        |
+          | `rd email`                 | Materialize a digital address             |
+          | `rd date`                  | Pluck a random day from the timeline      |
+          | `rd color`                 | Extract a chromatic hex essence           |
           
           ## 💫 Join the RandomGen Universe
           
