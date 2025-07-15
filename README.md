@@ -177,7 +177,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 
 ### v1.0.2 - Enhanced Password Generator Options
 ![Password Generator Options](assets/demo-password-options.png)
-
+![Password Generator Options2](assets/demo-password-options2.png)
 1. **Enhanced Option Syntax Support**
    - Now supports multiple ways to specify options:
      - Exclusion: `-upper`, `-special`, `-numeric`, `-lower`
