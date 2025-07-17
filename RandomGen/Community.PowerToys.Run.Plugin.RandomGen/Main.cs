@@ -62,10 +62,29 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
         private bool Disposed { get; set; }
 
         private Faker _faker;
+       private string _locale = "en";
+
+        private static readonly HashSet<string> SupportedLocales = new(
+            new[]{
+                "af_ZA","ar","az","cz","de","de_AT","de_CH","el","en","en_AU","en_AU_ocker",
+                "en_BORK","en_CA","en_GB","en_IE","en_IND","en_NG","en_US","en_ZA","es",
+                "es_MX","fa","fi","fr","fr_CA","fr_CH","ge","hr","id_ID","it","ja","ko","lv",
+                "nb_NO","ne","nl","nl_BE","pl","pt_BR","pt_PT","ro","ru","sk","sv","tr","uk","vi",
+                "zh_CN","zh_TW","zu_ZA"
+            });
 
         private Faker GetFaker()
         {
-            return _faker ??= new Faker();
+            return _faker ??= new Faker(_locale);
+        }
+
+        private void SetLocale(string locale)
+        {
+            if (SupportedLocales.Contains(locale))
+            {
+                _locale = locale;
+                _faker = new Faker(_locale);
+            }
         }
 
         // Method to clean up duplicate action keyword prefixes
@@ -129,6 +148,7 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                     "color" => [GenerateColor()],
                     "url" => [GenerateUrl()],
                     "credit" or "creditcard" => [GenerateCreditCard()],
+                    "locale" => [ChangeLocale(parameters)],
                     _ => GetFilteredSuggestions(command)
                 };
             }
@@ -519,6 +539,41 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
             return
             [
                 CreateHelpResult("password [length] [options]", "Generate random password (default: 12 chars)", "password 16 -special"),
+                        private Result ChangeLocale(string parameter)
+        {
+            if (string.IsNullOrWhiteSpace(parameter))
+            {
+                return new Result
+                {
+                    QueryTextDisplay = "locale",
+                    IcoPath = IconPath,
+                    Title = $"Current locale: {_locale}",
+                    SubTitle = "Specify a locale code to change",
+                };
+            }
+
+            var code = parameter.Trim();
+            if (!SupportedLocales.Contains(code))
+            {
+                return new Result
+                {
+                    QueryTextDisplay = $"locale {code}",
+                    IcoPath = IconPath,
+                    Title = "Invalid locale",
+                    SubTitle = $"Supported: {string.Join(",", SupportedLocales)}",
+                };
+            }
+
+            SetLocale(code);
+            return new Result
+            {
+                QueryTextDisplay = $"locale {code}",
+                IcoPath = IconPath,
+                Title = $"Locale set to {code}",
+                SubTitle = "Locale changed for future results",
+            };
+        }
+
                 CreateHelpResult("pwd [length] [options]", "Generate password with options (-lower, -upper, -numeric, -special)", "pwd 20 -symbols"),
                 CreateHelpResult("email", "Generate random email address", "email"),
                 CreateHelpResult("name", "Generate random full name", "name"),
@@ -555,6 +610,7 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                 ("color", "Generate random hex color", "color"),
                 ("url", "Generate random URL", "url"),
                 ("credit", "Generate random credit card number", "credit"),
+                ("locale", "Change data generation locale", "locale fr"),
                 ("creditcard", "Generate random credit card number", "creditcard")
             };
 
@@ -888,4 +944,5 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
             Disposed = true;
         }
     }
+}
 }

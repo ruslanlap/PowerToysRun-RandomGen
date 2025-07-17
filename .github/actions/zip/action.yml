@@ -1,0 +1,21 @@
+name: 'Zip and Upload Artifact'
+description: 'Zips a directory and uploads it as an artifact'
+inputs:
+  source:
+    description: 'Source directory to zip'
+    required: true
+  artifact_name:
+    description: 'Name of the artifact'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Zip directory
+      run: |
+        zip -r ${{ inputs.artifact_name }}.zip ${{ inputs.source }}
+      shell: bash
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact_name }}
+        path: ${{ inputs.artifact_name }}.zip
