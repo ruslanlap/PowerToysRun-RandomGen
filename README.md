@@ -22,14 +22,9 @@
   <div>
     <img src="https://img.shields.io/badge/Supported%20Data%20Types-14%2B-success?style=flat-square" alt="Supported Data Types">
     <img src="https://img.shields.io/badge/Platform-Windows%2010%2B-0078d7?style=flat-square" alt="Windows 10+">
-    <img src="https://img.shields.io/badge/PowerToys-v0.75%2B-0078d7?style=flat-square" alt="PowerToys v0.75+">
-    <img src="https://img.shields.io/badge/PTRUN-Compliant-brightgreen?style=flat-square" alt="PTRUN Compliant">
     <img src="https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square" alt=".NET 9.0">
     <img src="https://img.shields.io/badge/Arch-x64%20%7C%20ARM64-0078d7?style=flat-square" alt="x64 | ARM64">
-    <img src="https://img.shields.io/badge/Code%20Quality-A-brightgreen?style=flat-square" alt="Code Quality">
-    <img src="https://img.shields.io/badge/Windows%2011-Compatible-0078d7?style=flat-square&logo=windows" alt="Windows 11 Compatible">
     <img src="https://img.shields.io/badge/Automated%20Builds-CI%2FCD-2088FF?style=flat-square&logo=github-actions" alt="Automated Builds">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome">
     <img src="https://img.shields.io/maintenance/yes/2025?style=flat-square" alt="Maintenance">
     <img src="https://img.shields.io/badge/C%23-.NET%209-512BD4?style=flat-square" alt="C# .NET 9">
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/stargazers">
@@ -40,7 +35,6 @@
     </a>
     <img src="https://img.shields.io/github/last-commit/ruslanlap/PowerToysRun-RandomGen?style=flat-square" alt="Last Commit">
     <img src="https://img.shields.io/github/commit-activity/m/ruslanlap/PowerToysRun-RandomGen?style=flat-square" alt="Commit Activity">
-    <img src="https://img.shields.io/badge/PowerToys-Run%20Plugin-0078d7?style=flat-square" alt="PowerToys Run Plugin">
     <a href="https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20PowerToys%20Run%20Random%20Data%20Generator%20plugin!&url=https://github.com/ruslanlap/PowerToysRun-RandomGen">
       <img src="https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fruslanlap%2FPowerToysRun-RandomGen" alt="Tweet">
     </a>
