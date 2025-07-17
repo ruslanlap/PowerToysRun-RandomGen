@@ -1,6 +1,6 @@
-# 🎲 RandomGen v1.0.2 – Unleashed!
+# 🎲 RandomGen v1.0.2!
 <p align="center">
-  <img src="https://github.com/ruslanlap/PowerToysRun-RandomGen/raw/master/assets/randomgen.logo.png" width="128" alt="RandomGen Logo"/>
+  <img src="https://github.com/ruslanlap/PowerToysRun-RandomGen/raw/master/assets/randomgen.logo.png" width="228" alt="RandomGen Logo"/>
 </p>
 
 ## ✨ What's New
@@ -9,6 +9,12 @@
     <img src="https://github.com/ruslanlap/PowerToysRun-RandomGen/raw/master/assets/locale.png" width="600" alt="Locale Selection"/>
   </p>
 - 🔐 **Enhanced Password Generator** (customizable options)
+- Now supports multiple ways to specify options:
+
+    Exclusion: -upper, -special, -numeric, -lower
+    Inclusion: +upper, +special, +numeric, +lower
+    Natural language: noupper, no-special, nonumbers
+
 - 🚀 Turbocharged performance
 - 🛡️ **Fixed all PTRUN validation errors**:
   - **PTRUN1301**: Corrected package naming format from "RandomGen-v{VERSION}-{platform}.zip" to "RandomGen-{VERSION}-{platform}.zip"
