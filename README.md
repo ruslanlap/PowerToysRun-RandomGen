@@ -28,7 +28,7 @@
     <img src="https://img.shields.io/maintenance/yes/2025?style=flat-square" alt="Maintenance">
     <img src="https://img.shields.io/badge/C%23-.NET%209-512BD4?style=flat-square" alt="C# .NET 9">
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/stargazers">
-      <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-RandomGen?style=flat-square" alt="GitHub stars">
+      <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-RandomGen?style=flat-square&color=yellow" alt="GitHub stars">
     </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/issues">
       <img src="https://img.shields.io/github/issues/ruslanlap/PowerToysRun-RandomGen?style=flat-square" alt="GitHub issues">
