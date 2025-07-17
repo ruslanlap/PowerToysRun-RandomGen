@@ -226,6 +226,13 @@ Use the activation keyword `rd` followed by the data type you want to generate:
 | `rd creditcard` | `rd creditcard` | Generate a random credit card number (test use only) |
 | `rd credit` | `rd credit` | Alias for creditcard command |
 
+
+### Supported Locales
+Bogus supports many locales. Use `rd locale <code>` to change the language for generated data. Supported locale codes include:
+`af_ZA`, `ar`, `az`, `cz`, `de`, `de_AT`, `de_CH`, `el`, `en`, `en_AU`, `en_AU_ocker`, `en_BORK`, `en_CA`, `en_GB`, `en_IE`, `en_IND`, `en_NG`, `en_US`, `en_ZA`, `es`, `es_MX`, `fa`, `fi`, `fr`, `fr_CA`, `fr_CH`, `ge`, `hr`, `id_ID`, `it`, `ja`, `ko`, `lv`, `nb_NO`, `ne`, `nl`, `nl_BE`, `pl`, `pt_BR`, `pt_PT`, `ro`, `ru`, `sk`, `sv`, `tr`, `uk`, `vi`, `zh_CN`, `zh_TW`, `zu_ZA`.
+
+| `rd locale [code]` | `rd locale fr` | Change data generation locale |
+
 ### Examples
 
 ```bash
@@ -243,6 +250,10 @@ rd number 1-1000
 
 # Generate 25 words of lorem ipsum text
 rd lorem 25
+
+
+# Change locale to French
+rd locale fr (or other `af_ZA`, `ar`, `az`, `cz`, `de`, `de_AT`, `de_CH`, `el`, `en`, `en_AU`, `en_AU_ocker`, `en_BORK`, `en_CA`, `en_GB`, `en_IE`, `en_IND`, `en_NG`, `en_US`, `en_ZA`, `es`, `es_MX`, `fa`, `fi`, `fr`, `fr_CA`, `fr_CH`, `ge`, `hr`, `id_ID`, `it`, `ja`, `ko`, `lv`, `nb_NO`, `ne`, `nl`, `nl_BE`, `pl`, `pt_BR`, `pt_PT`, `ro`, `ru`, `sk`, `sv`, `tr`, `uk`, `vi`, `zh_CN`, `zh_TW`, `zu_ZA` )
 ```
 
 ## ☕ Support
