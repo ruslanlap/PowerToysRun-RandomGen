@@ -536,10 +536,26 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
 
         private List<Result> GetHelpResults()
         {
-            return
-            [
+            return new List<Result>
+            {
                 CreateHelpResult("password [length] [options]", "Generate random password (default: 12 chars)", "password 16 -special"),
-                        private Result ChangeLocale(string parameter)
+                CreateHelpResult("pwd [length] [options]", "Generate password with options (-lower, -upper, -numeric, -special)", "pwd 20 -symbols"),
+                CreateHelpResult("email", "Generate random email address", "email"),
+                CreateHelpResult("name", "Generate random full name", "name"),
+                CreateHelpResult("address", "Generate random address", "address"),
+                CreateHelpResult("phone", "Generate random phone number", "phone"),
+                CreateHelpResult("company", "Generate random company name", "company"),
+                CreateHelpResult("lorem [words]", "Generate lorem ipsum text", "lorem 20"),
+                CreateHelpResult("number [min-max]", "Generate random number", "number 1-1000"),
+                CreateHelpResult("date", "Generate random date", "date"),
+                CreateHelpResult("guid", "Generate random GUID/UUID", "guid"),
+                CreateHelpResult("color", "Generate random hex color", "color"),
+                CreateHelpResult("url", "Generate random URL", "url"),
+                CreateHelpResult("creditcard", "Generate random credit card number", "creditcard")
+            };
+        }
+
+        private Result ChangeLocale(string parameter)
         {
             if (string.IsNullOrWhiteSpace(parameter))
             {
@@ -572,22 +588,6 @@ namespace Community.PowerToys.Run.Plugin.RandomGen
                 Title = $"Locale set to {code}",
                 SubTitle = "Locale changed for future results",
             };
-        }
-
-                CreateHelpResult("pwd [length] [options]", "Generate password with options (-lower, -upper, -numeric, -special)", "pwd 20 -symbols"),
-                CreateHelpResult("email", "Generate random email address", "email"),
-                CreateHelpResult("name", "Generate random full name", "name"),
-                CreateHelpResult("address", "Generate random address", "address"),
-                CreateHelpResult("phone", "Generate random phone number", "phone"),
-                CreateHelpResult("company", "Generate random company name", "company"),
-                CreateHelpResult("lorem [words]", "Generate lorem ipsum text", "lorem 20"),
-                CreateHelpResult("number [min-max]", "Generate random number", "number 1-1000"),
-                CreateHelpResult("date", "Generate random date", "date"),
-                CreateHelpResult("guid", "Generate random GUID/UUID", "guid"),
-                CreateHelpResult("color", "Generate random hex color", "color"),
-                CreateHelpResult("url", "Generate random URL", "url"),
-                CreateHelpResult("creditcard", "Generate random credit card number", "creditcard")
-            ];
         }
 
         private List<Result> GetFilteredSuggestions(string query)
