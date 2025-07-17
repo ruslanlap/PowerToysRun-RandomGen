@@ -271,7 +271,7 @@ rd locale fr (or other `af_ZA`, `ar`, `az`, `cz`, `de`, `de_AT`, `de_CH`, `el`, 
 ## ☕ Support
 Enjoying RandomGen? ☕ Buy me a coffee to support development:
 
-[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕️-FFDD00?style=for-the-badge&logo=buy-me-a-coffee)](https://ruslanlap.github.io/ruslanlap_buymeacoffe/)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-☕️-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&labelColor=000000&logoColor=white&labelWidth=100&logoWidth=100)](https://ruslanlap.github.io/ruslanlap_buymeacoffe/)
 
 ### Advanced Features
 
