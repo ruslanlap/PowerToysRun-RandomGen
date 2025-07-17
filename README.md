@@ -256,12 +256,17 @@ rd lorem 25
 rd locale fr (or other `af_ZA`, `ar`, `az`, `cz`, `de`, `de_AT`, `de_CH`, `el`, `en`, `en_AU`, `en_AU_ocker`, `en_BORK`, `en_CA`, `en_GB`, `en_IE`, `en_IND`, `en_NG`, `en_US`, `en_ZA`, `es`, `es_MX`, `fa`, `fi`, `fr`, `fr_CA`, `fr_CH`, `ge`, `hr`, `id_ID`, `it`, `ja`, `ko`, `lv`, `nb_NO`, `ne`, `nl`, `nl_BE`, `pl`, `pt_BR`, `pt_PT`, `ro`, `ru`, `sk`, `sv`, `tr`, `uk`, `vi`, `zh_CN`, `zh_TW`, `zu_ZA` )
 ```
 
-<p align="center">
-  <img src="./assets/locale.png" width="600" alt="Locale Selection Screenshot"/>
-</p>
-<p align="center">
-  <img src="./assets/locale2.png" width="600" alt="Locale Selection Screenshot"/>
-</p>
+<table>
+  <tr>
+    <td><img src="./assets/locale.png" width="100%" alt="Locale Selection - Setting locale"/></td>
+  </tr>
+  <tr>
+    <td><img src="./assets/locale2.png" width="100%" alt="Locale Selection - UK locale"/></td>
+  </tr>
+  <tr>
+    <td><img src="./assets/locale3.png" width="100%" alt="Locale Selection - FR locale"/></td>
+  </tr>
+</table>
 
 ## ☕ Support
 Enjoying RandomGen? ☕ Buy me a coffee to support development:
