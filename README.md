@@ -38,6 +38,9 @@
     <a href="https://twitter.com/intent/tweet?text=Check%20out%20this%20awesome%20PowerToys%20Run%20Random%20Data%20Generator%20plugin!&url=https://github.com/ruslanlap/PowerToysRun-RandomGen">
       <img src="https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fruslanlap%2FPowerToysRun-RandomGen" alt="Tweet">
     </a>
+    <img src="https://img.shields.io/badge/Awesome-Yes-orange" alt="Awesome">
+    <a href="https://github.com/hlaueriksson/awesome-powertoys-run-plugins">
+      <img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome PowerToys Run Plugins"> </a>
   </div>
 
   <div style="margin: 20px 0;">
