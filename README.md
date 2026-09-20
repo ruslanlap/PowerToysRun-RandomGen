@@ -44,10 +44,10 @@
   </div>
 
   <div style="margin: 20px 0;">
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.2-x64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.1.0-x64.zip">
       <img src="https://img.shields.io/badge/Download_x64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download x64 Version">
     </a>
-    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.0.2-arm64.zip">
+    <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/latest/download/RandomGen-1.1.0-arm64.zip">
       <img src="https://img.shields.io/badge/Download_ARM64-2088FF?style=for-the-badge&logo=windows&logoColor=white&labelColor=24292f" alt="Download ARM64 Version">
     </a>
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/releases">
@@ -160,7 +160,7 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 
 ## 🚀 Quick Start
 
-1. **Download** the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-arm64.zip))
+1. **Download** the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.1.0/RandomGen-1.1.0-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.1.0/RandomGen-1.1.0-arm64.zip))
 2. **Extract** the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
@@ -171,6 +171,19 @@ RandomGen is a powerful PowerToys Run plugin that generates various types of ran
 6. Best practice: Press the Space button to regenerate a new value.
 
 ## 📋 Changelog
+
+### v1.1.0 - New Generators & Code Quality
+
+1. **New commands**
+   - `rd pin [length]` — numeric PIN (4–12 digits), weak patterns auto-rejected (0000, 1234, etc.)
+   - `rd ip` — random IPv4 address
+   - `rd username` / `rd user` — random username
+
+2. **Bug fixes**
+   - `locale` command now appears in the help list (`rd` with no args)
+
+3. **Code quality**
+   - Extracted `CopyAction()` helper — removed 14× duplicated clipboard lambdas
 
 ### v1.0.2 - Enhanced Password Generator Options
 ![Password Generator Options](assets/demo-password-options.png)
@@ -291,7 +304,7 @@ Enjoying RandomGen? ☕ Buy me a coffee to support development:
 ### Installation Steps
 
 #### Method 1: Using the Release Package
-1. Download the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.0.2/RandomGen-1.0.2-arm64.zip))
+1. Download the latest release for your architecture ([x64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.1.0/RandomGen-1.1.0-x64.zip) or [ARM64](https://github.com/ruslanlap/PowerToysRun-RandomGen/releases/download/v1.1.0/RandomGen-1.1.0-arm64.zip))
 2. Extract the ZIP file to your PowerToys Run plugins directory:
    ```
    %LOCALAPPDATA%\Microsoft\PowerToys\PowerToys Run\Plugins\RandomGen\
