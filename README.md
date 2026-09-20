@@ -20,12 +20,12 @@
   </div>
 
   <div>
-    <img src="https://img.shields.io/badge/Supported%20Data%20Types-14%2B-success?style=flat-square" alt="Supported Data Types">
+    <img src="https://img.shields.io/badge/Supported%20Data%20Types-17%2B-success?style=flat-square" alt="Supported Data Types">
     <img src="https://img.shields.io/badge/Platform-Windows%2010%2B-0078d7?style=flat-square" alt="Windows 10+">
     <img src="https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square" alt=".NET 9.0">
     <img src="https://img.shields.io/badge/Arch-x64%20%7C%20ARM64-0078d7?style=flat-square" alt="x64 | ARM64">
     <img src="https://img.shields.io/badge/Automated%20Builds-CI%2FCD-2088FF?style=flat-square&logo=github-actions" alt="Automated Builds">
-    <img src="https://img.shields.io/maintenance/yes/2025?style=flat-square" alt="Maintenance">
+    <img src="https://img.shields.io/maintenance/yes/2026?style=flat-square" alt="Maintenance">
     <img src="https://img.shields.io/badge/C%23-.NET%209-512BD4?style=flat-square" alt="C# .NET 9">
     <a href="https://github.com/ruslanlap/PowerToysRun-RandomGen/stargazers">
       <img src="https://img.shields.io/github/stars/ruslanlap/PowerToysRun-RandomGen?style=flat-square&color=yellow" alt="GitHub stars">
