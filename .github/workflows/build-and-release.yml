@@ -133,6 +133,11 @@ jobs:
 
           ## ✨ What’s New
           - 🔐 **Enhanced Password Generator** (customizable options)
+          - 🔢 **PIN generator** (\`rd pin [length]\`) with weak-pattern detection
+          - 🌐 **IP address generator** (\`rd ip\`)
+          - 👤 **Username generator** (\`rd username\`)
+          - 🗺️ **Locale** now visible in help list (\`rd locale [code]\`)
+          - 🧹 DRY clipboard helper — leaner code, same behavior
           - 🚀 Turbocharged performance
           - 🛡️ Bug fixes & PTRUN compliance
 
